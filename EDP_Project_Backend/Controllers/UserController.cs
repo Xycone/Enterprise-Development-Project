@@ -1,5 +1,9 @@
 ﻿using EDP_Project_Backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -8,9 +12,34 @@ namespace EDP_Project_Backend.Controllers
     public class UserController : ControllerBase
     {
         private readonly MyDbContext _context;
-        public UserController(MyDbContext context)
+        private readonly IConfiguration _configuration;
+        public UserController(MyDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+        }
+
+        private string CreateToken(User user)
+        {
+            string secret = _configuration.GetValue<string>("Authentication:Secret");
+            int tokenExpiresDays = _configuration.GetValue<int>("Authentication:TokenExpiresDays");
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.UserEmail)
+            }),
+                Expires = DateTime.UtcNow.AddDays(tokenExpiresDays),
+                SigningCredentials = new SigningCredentials(
+            new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            string token = tokenHandler.WriteToken(securityToken);
+            return token;
         }
 
         [HttpPost("register")]
@@ -82,9 +111,10 @@ namespace EDP_Project_Backend.Controllers
                 foundUser.TotalSpent,
                 foundUser.TotalBookings,
                 foundUser.IsAdmin
-
             };
-            return Ok(new { user });
+
+            string accessToken = CreateToken(foundUser);
+            return Ok(new { user, accessToken });
         }
     }
 }
