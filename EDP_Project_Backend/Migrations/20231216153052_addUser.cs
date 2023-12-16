@@ -5,7 +5,7 @@
 namespace EDP_Project_Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateTier : Migration
+    public partial class addUser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -7,12 +7,12 @@ namespace EDP_Project_Backend.Models
     {
         public int Id { get; set; }
 
-        public Boolean UserType {  get; set; }
+        public Boolean IsAdmin {  get; set; }
 
         [MaxLength(50)]
         public string UserName { get; set; } = string.Empty;
 
-        [MaxLength(50)]
+        [MaxLength(100)]
         public string UserPassword { get; set; } = string.Empty;
 
         public string UserPicture { get; set; } = string.Empty;
