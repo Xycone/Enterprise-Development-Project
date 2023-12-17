@@ -1,4 +1,5 @@
 ﻿using EDP_Project_Backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -31,7 +32,10 @@ namespace EDP_Project_Backend.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.UserEmail)
+                new Claim(ClaimTypes.Email, user.UserEmail),
+                // If user IsAdmin is true, it assigns the value "admin" to the role claim.
+                // If user isAdmin is false, it assigns the value "user" to the role claim.
+                new Claim(ClaimTypes.Role, user.IsAdmin ? "admin" : "user")
             }),
                 Expires = DateTime.UtcNow.AddDays(tokenExpiresDays),
                 SigningCredentials = new SigningCredentials(
@@ -115,6 +119,31 @@ namespace EDP_Project_Backend.Controllers
 
             string accessToken = CreateToken(foundUser);
             return Ok(new { user, accessToken });
+        }
+
+        [HttpGet("auth"), Authorize]
+        public IActionResult Auth()
+        {
+            var id = Convert.ToInt32(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault());
+            var name = User.Claims.Where(c => c.Type == ClaimTypes.Name).Select(c => c.Value).SingleOrDefault();
+            var email = User.Claims.Where(c => c.Type == ClaimTypes.Email).Select(c => c.Value).SingleOrDefault();
+            var isAdmin = User.IsInRole("admin");
+
+            if (id != 0 && name != null && email != null)
+            {
+                var user = new
+                {
+                    id,
+                    email,
+                    name,
+                    isAdmin
+                };
+                return Ok(new { user });
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
     }
 }

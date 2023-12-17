@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace EDP_Project_Backend.Models
 {
@@ -22,6 +23,10 @@ namespace EDP_Project_Backend.Models
 
         // Tier position relative to other
         public int TierPosition { get; set; }
+
+        // Navigation property to represent the one-to-many relationship
+        [JsonIgnore]
+        public List<User>? Users { get; set; }
 
         [Column(TypeName = "datetime")]
         public DateTime CreatedAt { get; set; }

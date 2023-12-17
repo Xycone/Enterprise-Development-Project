@@ -1,6 +1,8 @@
 ﻿using EDP_Project_Backend.Models;
 using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -12,6 +14,20 @@ namespace EDP_Project_Backend.Controllers
         public TierController(MyDbContext context)
         {
             _context = context;
+        }
+
+        // Used to retrieve the authenticated user's userid
+        private int GetUserId()
+        {
+            return Convert.ToInt32(User.Claims
+            .Where(c => c.Type == ClaimTypes.NameIdentifier)
+            .Select(c => c.Value).SingleOrDefault());
+        }
+
+        // Used to retrieve the authenticated user's admin status to check if he is admin or not
+        private bool IsUserAdmin()
+        {
+            return User.IsInRole("admin");
         }
 
 
@@ -29,7 +45,7 @@ namespace EDP_Project_Backend.Controllers
 
 
         // Fields needed TierName, TierBookings and TierSpendings
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "admin")]
         public IActionResult AddTier(Tier tier)
         {
             var now = DateTime.Now;
@@ -54,7 +70,7 @@ namespace EDP_Project_Backend.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}"), Authorize(Roles = "admin")]
         public IActionResult GetTier(int id)
         {
             Tier? tier = _context.Tiers.Find(id);
@@ -67,7 +83,7 @@ namespace EDP_Project_Backend.Controllers
 
 
         // Fields needed TierName, TierBookings, TierSpendings and TierPosition
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "admin")]
         public IActionResult UpdateTier(int id, Tier tier)
         {
             var myTier = _context.Tiers.Find(id);
@@ -123,7 +139,7 @@ namespace EDP_Project_Backend.Controllers
         }
 
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "admin")]
         public IActionResult DeleteTier(int id)
         {
             var myTier = _context.Tiers.Find(id);

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace EDP_Project_Backend.Models
 {
@@ -12,7 +13,7 @@ namespace EDP_Project_Backend.Models
         [MaxLength(50)]
         public string UserName { get; set; } = string.Empty;
 
-        [MaxLength(100)]
+        [MaxLength(100), JsonIgnore]
         public string UserPassword { get; set; } = string.Empty;
 
         public string UserPicture { get; set; } = string.Empty;
@@ -28,6 +29,11 @@ namespace EDP_Project_Backend.Models
 
         [Range(1, int.MaxValue)]
         public int TotalBookings { get; set; }
+
+        // Foreign key
+        public int TierId { get; set; }
+        // Navigation property to represent the one-to-many relationship
+        public Tier? Tier { get; set; }
 
         [Column(TypeName = "datetime")]
         public DateTime CreatedAt { get; set; }
