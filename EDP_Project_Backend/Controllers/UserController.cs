@@ -20,6 +20,13 @@ namespace EDP_Project_Backend.Controllers
             _configuration = configuration;
         }
 
+        private int GetUserId()
+        {
+            return Convert.ToInt32(User.Claims
+            .Where(c => c.Type == ClaimTypes.NameIdentifier)
+            .Select(c => c.Value).SingleOrDefault());
+        }
+
         private string CreateToken(User user)
         {
             string secret = _configuration.GetValue<string>("Authentication:Secret");
@@ -57,12 +64,18 @@ namespace EDP_Project_Backend.Controllers
             request.PhoneNumber = request.PhoneNumber.Trim();
 
             // Check email
-            var foundUser = _context.Users.Where(
-            x => x.UserEmail == request.Email).FirstOrDefault();
+            var foundUser = _context.Users.Where(x => x.UserEmail == request.Email).FirstOrDefault();
             if (foundUser != null)
             {
                 string message = "Email already exists.";
                 return BadRequest(new { message });
+            }
+
+            // Checks for the tier with the lowest tier position
+            var lowestTier = _context.Tiers.OrderBy(t => t.TierPosition).FirstOrDefault();
+            if (lowestTier == null)
+            {
+                return BadRequest("No tiers available. Unable to assign user to a tier.");
             }
 
             // Create user object
@@ -75,6 +88,7 @@ namespace EDP_Project_Backend.Controllers
                 UserPassword = passwordHash,
                 IsAdmin = false,
                 UserHp = request.PhoneNumber,
+                TierId = lowestTier.Id,
                 CreatedAt = now,
                 UpdatedAt = now
             };
@@ -121,6 +135,8 @@ namespace EDP_Project_Backend.Controllers
             return Ok(new { user, accessToken });
         }
 
+        // Used to retrieve info stored in claims
+        // Not sure if i would really be using this tbh
         [HttpGet("auth"), Authorize]
         public IActionResult Auth()
         {
@@ -145,5 +161,85 @@ namespace EDP_Project_Backend.Controllers
                 return Unauthorized();
             }
         }
+
+        // Used by users to retrieve thier own user data
+        [HttpGet("profile"), Authorize]
+        public IActionResult GetUserProfile()
+        {
+            int userId = GetUserId();
+            var user = _context.Users.Find(userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var tier = _context.Tiers.FirstOrDefault(t => t.Id == user.TierId);
+
+            var userData = new
+            {
+                user.Id,
+                user.UserName,
+                user.UserEmail,
+                user.UserHp,
+                user.TotalSpent,
+                user.TotalBookings,
+                // Theorethically will show null if cant find a tier associated to the user
+                // Shd not happen tho as a user will be assigned the tier with the lowest tier position on registration
+                tier?.TierName
+            };
+
+            return Ok(userData);
+        }
+
+        // Called after checkout is confirmed to check if there shd be any upgrades in tier
+        [HttpPut("update-tier"), Authorize]
+        public IActionResult UpdateUserTier()
+        {
+            int userId = GetUserId();  // Assuming you have a method to get the user ID
+
+            var user = _context.Users.Find(userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Retrieve the tier associated with the user
+            var userTier = _context.Tiers.FirstOrDefault(t => t.Id == user.TierId);
+            if (userTier == null)
+            {
+                return BadRequest("User is not associated with a tier.");
+            }
+
+            // Checks conditions for tier upgrade based on events booked and money spent
+            if (user.TotalBookings >= userTier.TierBookings && user.TotalSpent >= userTier.TierSpendings)
+            {
+                // Performs tier upgrade operation
+                var nextTier = _context.Tiers.FirstOrDefault(t => t.TierPosition == userTier.TierPosition + 1);
+                if (nextTier != null)
+                {
+                    // Increase the user tier by 1
+                    // Subtract the overflow bookings by the amt used to upgrade the tier
+                    // Subtract the overflow spendings by the amt used to upgrade the tier
+                    user.TierId = nextTier.Id;
+                    user.TotalBookings -= userTier.TierBookings;
+                    user.TotalSpent -= userTier.TierSpendings;
+
+                    _context.SaveChanges();
+                    return Ok("User tier upgraded successfully.");
+                }
+                else
+                {
+                    return BadRequest("No higher tier available for upgrade.");
+                }
+
+            }
+            else
+            {
+                return BadRequest("User does not meet the criteria for tier upgrade");
+            }
+        }
+
     }
 }

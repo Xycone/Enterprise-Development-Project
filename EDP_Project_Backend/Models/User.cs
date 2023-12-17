@@ -24,9 +24,11 @@ namespace EDP_Project_Backend.Models
         [MaxLength(15)]
         public string UserHp { get; set; } = string.Empty;
 
+        // Stores the amt of extra spendings not used to level up a tier
         [Range(1, int.MaxValue)]
         public float TotalSpent { get; set; }
 
+        // Stores the amt of extra bookings not used to level up a tier
         [Range(1, int.MaxValue)]
         public int TotalBookings { get; set; }
 
