@@ -45,7 +45,7 @@ namespace EDP_Project_Backend.Controllers
             if ((perk.PercentageDiscount != 0 && perk.FixedDiscount != 0) ||
                 (perk.PercentageDiscount == 0 && perk.FixedDiscount == 0))
             {
-                return BadRequest("The perk either provides a percentage discount or fixed discount voucher. Please only choose one!");
+                return BadRequest("The perk either provides a percentage discount or fixed discount voucher. Please choose one!");
             }
 
             var myPerk = new Perk()
