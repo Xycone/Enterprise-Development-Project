@@ -34,7 +34,7 @@ namespace EDP_Project_Backend.Models
 
         // Foreign key
         // User belongs to a tier
-        public int TierId { get; set; }
+        public int? TierId { get; set; }
         // Navigation property to represent the one-to-many relationship
         public Tier? Tier { get; set; }
 

@@ -24,13 +24,6 @@ namespace EDP_Project_Backend.Controllers
             .Select(c => c.Value).SingleOrDefault());
         }
 
-        // Used to retrieve the authenticated user's admin status to check if he is admin or not
-        private bool IsUserAdmin()
-        {
-            return User.IsInRole("admin");
-        }
-
-
         [HttpGet]
         public IActionResult GetAll(string? search)
         {

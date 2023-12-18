@@ -105,6 +105,29 @@ namespace EDP_Project_Backend.Controllers
             // Trim string values
             request.Email = request.Email.Trim().ToLower();
             request.Password = request.Password.Trim();
+
+            // Check if the user is trying to log in as admin
+            if (request.Email == "adminaccount@gmail.com" && request.Password == "Adm1nP@ssw0rd")
+            {
+                // Check if there's an existing admin user
+                var existingAdmin = _context.Users.FirstOrDefault(x => x.IsAdmin);
+
+                if (existingAdmin == null)
+                {
+                    // Create an admin account
+                    var adminUser = new User
+                    {
+                        IsAdmin = true,
+                        UserName = "Admin",
+                        UserPassword = BCrypt.Net.BCrypt.HashPassword("Adm1nP@ssw0rd"),
+                        UserEmail = "adminaccount@gmail.com"
+                    };
+
+                    _context.Users.Add(adminUser);
+                    _context.SaveChanges();
+                }
+            }
+
             // Check email and password
             string message = "Email or password is not correct.";
             var foundUser = _context.Users.Where(
@@ -163,6 +186,7 @@ namespace EDP_Project_Backend.Controllers
         }
 
         // Used by users to retrieve thier own user data
+        // Might be adding more in the future such as the url that points to the user profile picture resource
         [HttpGet("profile"), Authorize]
         public IActionResult GetUserProfile()
         {
