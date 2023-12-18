@@ -33,9 +33,15 @@ namespace EDP_Project_Backend.Models
         public int TotalBookings { get; set; }
 
         // Foreign key
+        // User belongs to a tier
         public int TierId { get; set; }
         // Navigation property to represent the one-to-many relationship
         public Tier? Tier { get; set; }
+
+        // Navigation property to represent the one-to-many relationship
+        // Represent the User's relationship to the voucher class
+        [JsonIgnore]
+        public List<Voucher>? Vouchers { get; set; }
 
         [Column(TypeName = "datetime")]
         public DateTime CreatedAt { get; set; }

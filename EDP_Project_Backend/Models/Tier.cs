@@ -25,8 +25,14 @@ namespace EDP_Project_Backend.Models
         public int TierPosition { get; set; }
 
         // Navigation property to represent the one-to-many relationship
+        // Represent the Tier's relationship to the user class
         [JsonIgnore]
         public List<User>? Users { get; set; }
+
+        // Navigation property to represent the one-to-many relationship
+        // Represent the Tier's relationship to the perk class
+        [JsonIgnore]
+        public List<Perk>? Perks { get; set; }
 
         [Column(TypeName = "datetime")]
         public DateTime CreatedAt { get; set; }

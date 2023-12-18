@@ -23,5 +23,7 @@ namespace EDP_Project_Backend
         // Make sure to add here when new model is created
         public DbSet<Tier> Tiers { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Perk> Perks { get; set; }
+        public DbSet<Voucher> Vouchers { get; set; }
     }
 }

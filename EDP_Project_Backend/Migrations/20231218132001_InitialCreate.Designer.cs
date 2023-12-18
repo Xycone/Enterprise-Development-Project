@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231217105140_AddRelationship")]
-    partial class AddRelationship
+    [Migration("20231218132001_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,6 +21,43 @@ namespace EDP_Project_Backend.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<float>("FixedDiscount")
+                        .HasColumnType("float");
+
+                    b.Property<int>("MinGroupSize")
+                        .HasColumnType("int");
+
+                    b.Property<float>("MinSpend")
+                        .HasColumnType("float");
+
+                    b.Property<int>("PercentageDiscount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TierId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("VoucherQuantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TierId");
+
+                    b.ToTable("Perks");
+                });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Tier", b =>
                 {
@@ -108,6 +145,47 @@ namespace EDP_Project_Backend.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("EDP_Project_Backend.Models.Voucher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime>("DiscountExpiry")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("PerkId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PerkId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Vouchers");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>
+                {
+                    b.HasOne("EDP_Project_Backend.Models.Tier", "Tier")
+                        .WithMany("Perks")
+                        .HasForeignKey("TierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tier");
+                });
+
             modelBuilder.Entity("EDP_Project_Backend.Models.User", b =>
                 {
                     b.HasOne("EDP_Project_Backend.Models.Tier", "Tier")
@@ -119,9 +197,40 @@ namespace EDP_Project_Backend.Migrations
                     b.Navigation("Tier");
                 });
 
+            modelBuilder.Entity("EDP_Project_Backend.Models.Voucher", b =>
+                {
+                    b.HasOne("EDP_Project_Backend.Models.Perk", "Perk")
+                        .WithMany("Vouchers")
+                        .HasForeignKey("PerkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EDP_Project_Backend.Models.User", "User")
+                        .WithMany("Vouchers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Perk");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>
+                {
+                    b.Navigation("Vouchers");
+                });
+
             modelBuilder.Entity("EDP_Project_Backend.Models.Tier", b =>
                 {
+                    b.Navigation("Perks");
+
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.User", b =>
+                {
+                    b.Navigation("Vouchers");
                 });
 #pragma warning restore 612, 618
         }
