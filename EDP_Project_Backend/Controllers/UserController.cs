@@ -184,7 +184,7 @@ namespace EDP_Project_Backend.Controllers
                 user.UserHp,
                 user.TotalSpent,
                 user.TotalBookings,
-                // Theorethically will show null if cant find a tier associated to the user
+                // Theorethically will show null if it can't find a tier associated to the user
                 // Shd not happen tho as a user will be assigned the tier with the lowest tier position on registration
                 tier?.TierName
             };
@@ -192,54 +192,7 @@ namespace EDP_Project_Backend.Controllers
             return Ok(userData);
         }
 
-        // Called after checkout is confirmed to check if there shd be any upgrades in tier
-        [HttpPut("update-tier"), Authorize]
-        public IActionResult UpdateUserTier()
-        {
-            int userId = GetUserId();  // Assuming you have a method to get the user ID
-
-            var user = _context.Users.Find(userId);
-
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
-
-            // Retrieve the tier associated with the user
-            var userTier = _context.Tiers.FirstOrDefault(t => t.Id == user.TierId);
-            if (userTier == null)
-            {
-                return BadRequest("User is not associated with a tier.");
-            }
-
-            // Checks conditions for tier upgrade based on events booked and money spent
-            if (user.TotalBookings >= userTier.TierBookings && user.TotalSpent >= userTier.TierSpendings)
-            {
-                // Performs tier upgrade operation
-                var nextTier = _context.Tiers.FirstOrDefault(t => t.TierPosition == userTier.TierPosition + 1);
-                if (nextTier != null)
-                {
-                    // Increase the user tier by 1
-                    // Subtract the overflow bookings by the amt used to upgrade the tier
-                    // Subtract the overflow spendings by the amt used to upgrade the tier
-                    user.TierId = nextTier.Id;
-                    user.TotalBookings -= userTier.TierBookings;
-                    user.TotalSpent -= userTier.TierSpendings;
-
-                    _context.SaveChanges();
-                    return Ok("User tier upgraded successfully.");
-                }
-                else
-                {
-                    return BadRequest("No higher tier available for upgrade.");
-                }
-
-            }
-            else
-            {
-                return BadRequest("User does not meet the criteria for tier upgrade");
-            }
-        }
+        
 
     }
 }
