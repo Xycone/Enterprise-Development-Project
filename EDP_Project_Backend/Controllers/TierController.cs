@@ -131,7 +131,10 @@ namespace EDP_Project_Backend.Controllers
             return Ok();
         }
 
-
+        // Important!
+        // Delete request will move tiers with tier position greater than that of the tier being deleted forward by one in order to fill the gap
+        // Users tied to the tier being deleted will be bumped up a tier
+        // Request fails if there are no availble tiers to bump the user up to
         [HttpDelete("{id}"), Authorize(Roles = "admin")]
         public IActionResult DeleteTier(int id)
         {
@@ -140,6 +143,30 @@ namespace EDP_Project_Backend.Controllers
             {
                 return NotFound();
             }
+
+            var nextHighestTier = _context.Tiers.Where(t => t.TierPosition > myTier.TierPosition && t.Id != myTier.Id).OrderBy(t => t.TierPosition).FirstOrDefault();
+
+            if (nextHighestTier == null)
+            {
+                return BadRequest("No available tiers to upgrade users to.");
+            }
+
+            // Find the tiers with tier position greater than the tier being deleted
+            // Tier that is being delted is deleted
+            // Affected tiers have their tier position moved forward by one to fill in the gap in position left by deleting said tier
+            var affectedTiers = _context.Tiers.Where(t => t.TierPosition > myTier.TierPosition).ToList();
+            foreach (var tier in affectedTiers)
+            {
+                tier.TierPosition--;
+            }
+
+            // Bumps users currently in the tier being deleted up a tier 
+            var affectedUsers = _context.Users.Where(u => u.TierId == myTier.Id).ToList();
+            foreach (var user in affectedUsers)
+            {
+                user.TierId = nextHighestTier.Id;
+            }
+
             _context.Tiers.Remove(myTier);
             _context.SaveChanges();
             return Ok();
