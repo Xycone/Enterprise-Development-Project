@@ -7,6 +7,7 @@ using System.Diagnostics.Metrics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -16,10 +17,12 @@ namespace EDP_Project_Backend.Controllers
     {
         private readonly MyDbContext _context;
         private readonly IConfiguration _configuration;
-        public UserController(MyDbContext context, IConfiguration configuration)
+        private readonly IMapper _mapper;
+        public UserController(MyDbContext context, IConfiguration configuration, IMapper mapper)
         {
             _context = context;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         private int GetUserId()
@@ -102,6 +105,7 @@ namespace EDP_Project_Backend.Controllers
         }
 
         [HttpPost("login")]
+        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
         public IActionResult Login(LoginRequest request)
         {
             // Trim string values
@@ -156,13 +160,21 @@ namespace EDP_Project_Backend.Controllers
                 foundUser.IsAdmin
             };
 
+            // Return user info
+            UserDTO userDTO = _mapper.Map<UserDTO>(foundUser);
             string accessToken = CreateToken(foundUser);
+            LoginResponse response = new()
+            {
+                User = userDTO,
+                AccessToken = accessToken
+            };
+
             return Ok(new { user, accessToken });
         }
 
-        // Used to retrieve info stored in claims
-        // Not sure if i would really be using this tbh
+        // Used to retrieve user info stored in claims
         [HttpGet("auth"), Authorize]
+        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
         public IActionResult Auth()
         {
             var id = Convert.ToInt32(User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).SingleOrDefault());
@@ -172,14 +184,9 @@ namespace EDP_Project_Backend.Controllers
 
             if (id != 0 && name != null && email != null)
             {
-                var user = new
-                {
-                    id,
-                    email,
-                    name,
-                    isAdmin
-                };
-                return Ok(new { user });
+                UserDTO userDTO = new() { Id = id, UserName = name, UserEmail = email, IsAdmin = isAdmin };
+                AuthResponse response = new() { User = userDTO };
+                return Ok(response);
             }
             else
             {
@@ -190,11 +197,11 @@ namespace EDP_Project_Backend.Controllers
         // Used by users to retrieve thier own user data
         // Might be adding more in the future such as the url that points to the user profile picture resource
         [HttpGet("profile"), Authorize]
+        [ProducesResponseType(typeof(IEnumerable<UserProfileDTO>), StatusCodes.Status200OK)]
         public IActionResult GetUserProfile()
         {
             int userId = GetUserId();
             var user = _context.Users.Find(userId);
-
             if (user == null)
             {
                 return NotFound("User not found");
@@ -202,20 +209,11 @@ namespace EDP_Project_Backend.Controllers
 
             var tier = _context.Tiers.FirstOrDefault(t => t.Id == user.TierId);
 
-            var userData = new
-            {
-                user.Id,
-                user.UserName,
-                user.UserEmail,
-                user.UserHp,
-                user.TotalSpent,
-                user.TotalBookings,
-                // Theorethically will show null if it can't find a tier associated to the user
-                // Shd not happen tho as a user will be assigned the tier with the lowest tier position on registration
-                tier?.TierName
-            };
+            var data = _mapper.Map<UserProfileDTO>(user);
+            // Since TierName is not a part of the user object but derived by using the tierId found in user, we add it manually
+            data.TierName = tier?.TierName;
 
-            return Ok(userData);
+            return Ok(data);
         }
 
         // Returns all the users in the db
@@ -227,8 +225,21 @@ namespace EDP_Project_Backend.Controllers
             {
                 result = result.Where(x => x.UserName.Contains(search));
             }
-            var list = result.OrderBy(x => x.UserName).ToList();
-            return Ok(list);
+
+            var userList = result
+                .OrderBy(x => x.UserName)
+                .Select(user => new UserProfileDTO
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    UserEmail = user.UserEmail,
+                    UserHp = user.UserHp,
+                    TotalSpent = user.TotalSpent,
+                    TotalBookings = user.TotalBookings,
+                    TierName = _context.Tiers.Where(t => t.Id == user.TierId).Select(t => t.TierName).FirstOrDefault()
+                }).ToList();
+
+            return Ok(userList);
         }
 
         // For users to update their own profile
