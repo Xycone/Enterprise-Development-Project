@@ -17,6 +17,7 @@ namespace EDP_Project_Backend.Controllers
         }
 
         // Used to retrieve the authenticated user's userid
+        // prob wont need it but leave it here in case i need it in the future
         private int GetUserId()
         {
             return Convert.ToInt32(User.Claims
@@ -75,6 +76,7 @@ namespace EDP_Project_Backend.Controllers
         }
 
 
+        // Accepts id of tier to be updated as a parameter
         // Fields needed TierName, TierBookings, TierSpendings and TierPosition
         [HttpPut("{id}"), Authorize(Roles = "admin")]
         public IActionResult UpdateTier(int id, Tier tier)
@@ -135,6 +137,7 @@ namespace EDP_Project_Backend.Controllers
         // Delete request will move tiers with tier position greater than that of the tier being deleted forward by one in order to fill the gap
         // Users tied to the tier being deleted will be bumped up a tier
         // Request fails if there are no availble tiers to bump the user up to
+        // Only accept id of tier to be deleted as a parameter, no request body
         [HttpDelete("{id}"), Authorize(Roles = "admin")]
         public IActionResult DeleteTier(int id)
         {
