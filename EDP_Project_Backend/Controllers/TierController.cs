@@ -148,8 +148,9 @@ namespace EDP_Project_Backend.Controllers
             }
 
             var nextHighestTier = _context.Tiers.Where(t => t.TierPosition > myTier.TierPosition && t.Id != myTier.Id).OrderBy(t => t.TierPosition).FirstOrDefault();
-
-            if (nextHighestTier == null)
+            var affectedUsers = _context.Users.Where(u => u.TierId == myTier.Id).ToList();
+            // Only returns badrequest when there are users affected but no tier to bump them up to
+            if (nextHighestTier == null && affectedUsers.Count != 0)
             {
                 return BadRequest("No available tiers to upgrade users to.");
             }
@@ -164,7 +165,6 @@ namespace EDP_Project_Backend.Controllers
             }
 
             // Bumps users currently in the tier being deleted up a tier 
-            var affectedUsers = _context.Users.Where(u => u.TierId == myTier.Id).ToList();
             foreach (var user in affectedUsers)
             {
                 user.TierId = nextHighestTier.Id;
