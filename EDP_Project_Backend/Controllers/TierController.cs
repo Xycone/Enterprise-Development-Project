@@ -3,6 +3,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using AutoMapper;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -11,9 +12,11 @@ namespace EDP_Project_Backend.Controllers
     public class TierController : ControllerBase
     {
         private readonly MyDbContext _context;
-        public TierController(MyDbContext context)
+        private readonly IMapper _mapper;
+        public TierController(MyDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // Used to retrieve the authenticated user's userid
@@ -26,6 +29,7 @@ namespace EDP_Project_Backend.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<TierDTO>), StatusCodes.Status200OK)]
         public IActionResult GetAll(string? search)
         {
             IQueryable<Tier> result = _context.Tiers;
@@ -34,13 +38,27 @@ namespace EDP_Project_Backend.Controllers
                 result = result.Where(x => x.TierName.Contains(search));
             }
             var list = result.OrderBy(x => x.TierPosition).ToList();
-            return Ok(list);
+            IEnumerable<TierDTO> data = list.Select(t => _mapper.Map<TierDTO>(t));
+            return Ok(data);
         }
 
+        [HttpGet("{id}"), Authorize(Roles = "admin")]
+        [ProducesResponseType(typeof(TierDTO), StatusCodes.Status200OK)]
+        public IActionResult GetTier(int id)
+        {
+            Tier? tier = _context.Tiers.Find(id);
+            if (tier == null)
+            {
+                return NotFound();
+            }
+            TierDTO data = _mapper.Map<TierDTO>(tier);
+            return Ok(data);
+        }
 
         // Fields needed TierName, TierBookings and TierSpendings
         [HttpPost, Authorize(Roles = "admin")]
-        public IActionResult AddTier(Tier tier)
+        [ProducesResponseType(typeof(TierDTO), StatusCodes.Status200OK)]
+        public IActionResult AddTier(AddTierRequest tier)
         {
             var now = DateTime.Now;
             // Retrieves the current highest tier position in the db. 
@@ -60,26 +78,17 @@ namespace EDP_Project_Backend.Controllers
             };
             _context.Tiers.Add(myTier);
             _context.SaveChanges();
-            return Ok(myTier);
-        }
 
-
-        [HttpGet("{id}"), Authorize(Roles = "admin")]
-        public IActionResult GetTier(int id)
-        {
-            Tier? tier = _context.Tiers.Find(id);
-            if (tier == null)
-            {
-                return NotFound();
-            }
-            return Ok(tier);
+            Tier? newTier = _context.Tiers.FirstOrDefault(t => t.Id == myTier.Id);
+            TierDTO tierDTO = _mapper.Map<TierDTO>(newTier);
+            return Ok(tierDTO);
         }
 
 
         // Accepts id of tier to be updated as a parameter
         // Fields needed TierName, TierBookings, TierSpendings and TierPosition
         [HttpPut("{id}"), Authorize(Roles = "admin")]
-        public IActionResult UpdateTier(int id, Tier tier)
+        public IActionResult UpdateTier(int id, UpdateTierRequest tier)
         {
             var myTier = _context.Tiers.Find(id);
             if (myTier == null)
@@ -93,9 +102,18 @@ namespace EDP_Project_Backend.Controllers
                 return BadRequest("Invalid TierPosition. Tier position cannot be greater than the number of tiers");
             }
 
-            myTier.TierName = tier.TierName.Trim();
-            myTier.TierBookings = tier.TierBookings;
-            myTier.TierSpendings = tier.TierSpendings;
+            if (tier.TierName != null)
+            {
+                myTier.TierName = tier.TierName.Trim();
+            }
+            if (tier.TierBookings > 0)
+            {
+                myTier.TierBookings = tier.TierBookings;
+            }
+            if (tier.TierSpendings > 0)
+            {
+                myTier.TierSpendings = tier.TierSpendings;
+            }
 
             // Check if TierPosition is being changed in this update request
             if (myTier.TierPosition != tier.TierPosition)
@@ -104,28 +122,31 @@ namespace EDP_Project_Backend.Controllers
                 // New TierPosition of the tier
                 var newPosition = tier.TierPosition;
 
-                if (newPosition < myTier.TierPosition)
+                if (newPosition > 0)
                 {
-                    // If the newPosition is lower than the original position (e.g. 3 move to 1),
-                    // the other tiers with tier position greater than or equal to the new position will be moved back by one to make space
-                    var affectedTiersLower = _context.Tiers.Where(t => t.TierPosition >= newPosition && t.TierPosition < myTier.TierPosition && t.Id != myTier.Id).ToList();
-                    foreach (var affectedTier in affectedTiersLower)
+                    if (newPosition < myTier.TierPosition)
                     {
-                        affectedTier.TierPosition++;
+                        // If the newPosition is lower than the original position (e.g. 3 move to 1),
+                        // the other tiers with tier position greater than or equal to the new position will be moved back by one to make space
+                        var affectedTiersLower = _context.Tiers.Where(t => t.TierPosition >= newPosition && t.TierPosition < myTier.TierPosition && t.Id != myTier.Id).ToList();
+                        foreach (var affectedTier in affectedTiersLower)
+                        {
+                            affectedTier.TierPosition++;
+                        }
                     }
-                }
-                else
-                {
-                    // If the newPosition is higher than the original position (e.g. 1 move to 3),
-                    // the other tiers with tier position greater than or equal to the new position will be moved forward by one to fill the gap
-                    var affectedTiersHigher = _context.Tiers.Where(t => t.TierPosition > myTier.TierPosition && t.TierPosition <= newPosition && t.Id != myTier.Id).ToList();
-                    foreach (var affectedTier in affectedTiersHigher)
+                    else
                     {
-                        affectedTier.TierPosition--;
+                        // If the newPosition is higher than the original position (e.g. 1 move to 3),
+                        // the other tiers with tier position greater than or equal to the new position will be moved forward by one to fill the gap
+                        var affectedTiersHigher = _context.Tiers.Where(t => t.TierPosition > myTier.TierPosition && t.TierPosition <= newPosition && t.Id != myTier.Id).ToList();
+                        foreach (var affectedTier in affectedTiersHigher)
+                        {
+                            affectedTier.TierPosition--;
+                        }
                     }
-                }
 
-                myTier.TierPosition = newPosition;
+                    myTier.TierPosition = newPosition;
+                }
             }
 
             myTier.UpdatedAt = DateTime.Now;
@@ -167,7 +188,10 @@ namespace EDP_Project_Backend.Controllers
             // Bumps users currently in the tier being deleted up a tier 
             foreach (var user in affectedUsers)
             {
-                user.TierId = nextHighestTier.Id;
+                if (nextHighestTier != null)
+                {
+                    user.TierId = nextHighestTier.Id;
+                }
             }
 
             _context.Tiers.Remove(myTier);

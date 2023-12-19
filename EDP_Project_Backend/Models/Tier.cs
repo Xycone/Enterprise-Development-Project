@@ -22,6 +22,7 @@ namespace EDP_Project_Backend.Models
         public float TierSpendings { get; set; }
 
         // Tier position relative to other
+        [Required]
         public int TierPosition { get; set; }
 
         // Navigation property to represent the one-to-many relationship
