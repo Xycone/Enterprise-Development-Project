@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.Diagnostics.Metrics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -216,7 +218,55 @@ namespace EDP_Project_Backend.Controllers
             return Ok(userData);
         }
 
-        
+        // Returns all the users in the db
+        [HttpGet("view-users"), Authorize(Roles = "admin")]
+        public IActionResult GetAll(string? search)
+        {
+            IQueryable<User> result = _context.Users;
+            if (search != null)
+            {
+                result = result.Where(x => x.UserName.Contains(search));
+            }
+            var list = result.OrderBy(x => x.UserName).ToList();
+            return Ok(list);
+        }
+
+        // For users to update their own profile
+        // Takes in UserName, UserEmail and UserHp in the request body
+        [HttpPut("update-profile"), Authorize]
+        public IActionResult UpdateUser(UpdateProfileRequest user)
+        {
+            int userId = GetUserId();
+            var myUser = _context.Users.Find(userId);
+            if (myUser == null)
+            {
+                return NotFound();
+            }
+
+            // Check if updated email already exists
+            var foundUser = _context.Users.Where(x => x.UserEmail == user.UserEmail && x.Id != userId).FirstOrDefault();
+            if (foundUser != null)
+            {
+                string message = "Email already exists.";
+                return BadRequest(new { message });
+            }         
+
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(user.UserPassword.Trim());
+
+            myUser.UserName = user.UserName.Trim();
+            myUser.UserEmail = user.UserEmail.Trim().ToLower();
+            myUser.UserHp = user.UserHp.Trim();
+            myUser.UpdatedAt = DateTime.Now;
+
+            _context.SaveChanges();
+
+            return Ok(myUser);
+
+        }
+
+
+
+
 
     }
 }
