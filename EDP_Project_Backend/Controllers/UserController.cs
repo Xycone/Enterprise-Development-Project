@@ -218,6 +218,7 @@ namespace EDP_Project_Backend.Controllers
 
         // Returns all the users in the db
         [HttpGet("view-users"), Authorize(Roles = "admin")]
+        [ProducesResponseType(typeof(IEnumerable<UserProfileDTO>), StatusCodes.Status200OK)]
         public IActionResult GetAll(string? search)
         {
             IQueryable<User> result = _context.Users;
