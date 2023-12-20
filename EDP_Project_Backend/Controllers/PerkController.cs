@@ -1,6 +1,8 @@
 ﻿using EDP_Project_Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
+using System.Diagnostics.Metrics;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -9,14 +11,17 @@ namespace EDP_Project_Backend.Controllers
     public class PerkController : ControllerBase
     {
         private readonly MyDbContext _context;
-        public PerkController(MyDbContext context)
+        private readonly IMapper _mapper;
+        public PerkController(MyDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // Accepts the tierId that the perk(s) u are looking for belongs to in the parameter
         [HttpGet]
-        public IActionResult GetPerk(int tierid)
+        [ProducesResponseType(typeof(IEnumerable<PerkDTO>), StatusCodes.Status200OK)]
+        public IActionResult GetPerks(int tierid)
         {
             // Check if the specified tierid exists
             var existingTier = _context.Tiers.Find(tierid);
@@ -26,13 +31,21 @@ namespace EDP_Project_Backend.Controllers
                 return NotFound();
             }
 
-            var perk = _context.Perks.Where(p => p.TierId == tierid).ToList();
-            return Ok(perk);
+            var tierName = existingTier.TierName;
+            var perks = _mapper.Map<List<PerkDTO>>(_context.Perks.Where(p => p.TierId == tierid).ToList());
+
+            foreach (var perk in perks)
+            {
+                perk.TierName = tierName;
+            }
+
+            return Ok(perks);
         }
 
         // Accepts PercentageDiscount/FixedDiscount (only one of them can have a value), MinGroupSize, MinSpend, VoucherQuantity and TierId in the request body
         [HttpPost, Authorize(Roles = "admin")]
-        public IActionResult AddPerk(Perk perk)
+        [ProducesResponseType(typeof(PerkDTO), StatusCodes.Status200OK)]
+        public IActionResult AddPerk(AddPerkRequest perk)
         {
             var now = DateTime.Now;
 
@@ -63,13 +76,16 @@ namespace EDP_Project_Backend.Controllers
             _context.Perks.Add(myPerk);
             _context.SaveChanges();
 
-            return Ok(myPerk);
+
+            Perk? newPerk = _context.Perks.FirstOrDefault(p => p.Id == myPerk.Id);
+            PerkDTO perkDTO = _mapper.Map<PerkDTO>(newPerk);
+            return Ok(perkDTO);
         }
 
         // Accepts id of the perk that needs to be updated in the parameter
         // Accepts PercentageDiscount/FixedDiscount (only one of them can have a value), MinGroupSize, MinSpend and VoucherQuantity in the request body
         [HttpPut("{id}"), Authorize(Roles = "admin")]
-        public IActionResult UpdatePerk(int id, Perk perk)
+        public IActionResult UpdatePerk(int id, UpdatePerkRequest perk)
         {
             var myPerk = _context.Perks.Find(id);
             if (myPerk == null) 
@@ -77,15 +93,8 @@ namespace EDP_Project_Backend.Controllers
                 return NotFound();
             }
 
-            // Validate that tierId is not present in the request body
-            if (perk.TierId != myPerk.TierId)
-            {
-                return BadRequest("TierId cannot be changed in the update request.");
-            }
-
             // Check that either PercentageDiscount or FixedDiscount has a value
-            if ((perk.PercentageDiscount != 0 && perk.FixedDiscount != 0) ||
-                (perk.PercentageDiscount == 0 && perk.FixedDiscount == 0))
+            if ((perk.PercentageDiscount != 0 && perk.FixedDiscount != 0) || (perk.PercentageDiscount == 0 && perk.FixedDiscount == 0))
             {
                 return BadRequest("The perk either provides a percentage discount or fixed discount voucher. Please choose one!");
             }

@@ -7,10 +7,11 @@ namespace EDP_Project_Backend
     {
         public MappingProfile()
         {
-            CreateMap<Tier, TierDTO>();
             CreateMap<User, UserDTO>();
             CreateMap<User, UserBasicDTO>();
             CreateMap<User, UserProfileDTO>();
+            CreateMap<Tier, TierDTO>();
+            CreateMap<Perk, PerkDTO>();
         }
     }
 }
