@@ -252,21 +252,38 @@ namespace EDP_Project_Backend.Controllers
             if (myUser == null)
             {
                 return NotFound();
+            }      
+
+
+            if (user.UserName != null) 
+            {
+                myUser.UserName = user.UserName.Trim();
             }
 
-            // Check if updated email already exists
-            var foundUser = _context.Users.Where(x => x.UserEmail == user.UserEmail && x.Id != userId).FirstOrDefault();
-            if (foundUser != null)
+            if (user.UserPassword != null)
             {
-                string message = "Email already exists.";
-                return BadRequest(new { message });
-            }         
+                string passwordHash = BCrypt.Net.BCrypt.HashPassword(user.UserPassword.Trim());
+                myUser.UserPassword = passwordHash;
+            }
 
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(user.UserPassword.Trim());
+            if (user.UserEmail != null)
+            {
+                // Check if updated email already exists
+                var foundUser = _context.Users.Where(x => x.UserEmail == user.UserEmail && x.Id != userId).FirstOrDefault();
+                if (foundUser != null)
+                {
+                    string message = "Email already exists.";
+                    return BadRequest(new { message });
+                }
 
-            myUser.UserName = user.UserName.Trim();
-            myUser.UserEmail = user.UserEmail.Trim().ToLower();
-            myUser.UserHp = user.UserHp.Trim();
+                myUser.UserEmail = user.UserEmail.Trim().ToLower();
+            }
+
+            if (user.UserHp != null)
+            {
+                myUser.UserHp = user.UserHp.Trim();
+            }
+            
             myUser.UpdatedAt = DateTime.Now;
 
             _context.SaveChanges();
