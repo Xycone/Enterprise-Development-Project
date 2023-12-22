@@ -6,7 +6,12 @@ using System.Security.Claims;
 // TODO: Find some way to ensure that the update-bookings and update-spendings can only be called after payment is confirmed and successful on STRIPE
 // As of right now the request can be made as long as the user is authorized and knows the API endpoint which we do not want happening
 
+
 // Controller used to store APIs that is used in the upgrading of the user's tier
+
+// Hmm apparently it might be better to not put the code that does not require admin or user intervention as an API request
+// Will just leave this here for future use if i ever decide to use it
+// To be deleted on project submission
 namespace EDP_Project_Backend.Controllers
 {
     [ApiController]

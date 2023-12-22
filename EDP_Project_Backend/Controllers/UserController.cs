@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -201,17 +202,13 @@ namespace EDP_Project_Backend.Controllers
         public IActionResult GetUserProfile()
         {
             int userId = GetUserId();
-            var user = _context.Users.Find(userId);
+            var user = _context.Users.Include(u => u.Tier).FirstOrDefault(u => u.Id == userId);
             if (user == null)
             {
                 return NotFound("User not found");
             }
 
-            var tier = _context.Tiers.FirstOrDefault(t => t.Id == user.TierId);
-
             var data = _mapper.Map<UserProfileDTO>(user);
-            // Since TierName is not a part of the user object but derived by using the tierId found in user, we add it manually
-            data.TierName = tier?.TierName;
 
             return Ok(data);
         }

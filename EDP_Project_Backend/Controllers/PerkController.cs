@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using System.Diagnostics.Metrics;
+using Microsoft.EntityFrameworkCore;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -31,13 +32,7 @@ namespace EDP_Project_Backend.Controllers
                 return NotFound();
             }
 
-            var tierName = existingTier.TierName;
-            var perks = _mapper.Map<List<PerkDTO>>(_context.Perks.Where(p => p.TierId == tierid).ToList());
-
-            foreach (var perk in perks)
-            {
-                perk.TierName = tierName;
-            }
+            var perks = _mapper.Map<List<PerkDTO>>(_context.Perks.Where(p => p.TierId == tierid).Include(p => p.Tier).ToList());
 
             return Ok(perks);
         }
