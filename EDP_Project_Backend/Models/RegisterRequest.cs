@@ -16,7 +16,7 @@ namespace EDP_Project_Backend.Models
         [RegularExpression(@"^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$", ErrorMessage = "At least 1 letter and 1 number")]
         public string Password { get; set; } = string.Empty;
 
-        [Required, MaxLength(15)]
+        [Required, MinLength(8), MaxLength(8)]
         public string PhoneNumber { get; set; } = string.Empty;
     }
 }
