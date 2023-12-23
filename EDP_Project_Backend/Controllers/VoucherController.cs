@@ -30,7 +30,7 @@ namespace EDP_Project_Backend.Controllers
         // User
 
         // Retrieve all the vouchers (with voucher info) that belongs to the authorized user
-        [HttpGet, Authorize]
+        [HttpGet("GetMine"), Authorize]
         [ProducesResponseType(typeof(IEnumerable<VoucherDTO>), StatusCodes.Status200OK)]
         public IActionResult GetMine()
         {
@@ -66,7 +66,7 @@ namespace EDP_Project_Backend.Controllers
         // Admin
 
         // Retrieve all the vouchers availble in the db
-        [HttpGet, Authorize(Roles = "admin")]
+        [HttpGet("GetAll"), Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(IEnumerable<VoucherDTO>), StatusCodes.Status200OK)]
         public IActionResult GetAll()
         {
