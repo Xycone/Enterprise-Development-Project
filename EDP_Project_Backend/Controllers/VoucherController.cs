@@ -45,7 +45,7 @@ namespace EDP_Project_Backend.Controllers
 
         // User uses/deletes the voucher
         // Takes in the voucher id of the voucher being used/deleted
-        [HttpDelete, Authorize]
+        [HttpDelete("UseVoucher"), Authorize]
         public IActionResult UseVoucher(int id)
         {
             int userId = GetUserId();
@@ -79,7 +79,7 @@ namespace EDP_Project_Backend.Controllers
 
         // Admin can manually remove a voucher from the user 
         // Takes in the voucher id of the voucher being deleted
-        [HttpDelete, Authorize(Roles = "admin")]
+        [HttpDelete("DeleteVoucher"), Authorize(Roles = "admin")]
         public IActionResult YeetusDeletus(int id)
         {
             var myVoucher = _context.Vouchers.Find(id);
