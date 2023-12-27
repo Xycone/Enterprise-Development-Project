@@ -229,6 +229,7 @@ namespace EDP_Project_Backend.Controllers
                 .OrderBy(x => x.UserName)
                 .Select(user => new UserViewDTO
                 {
+                    Id = user.Id,
                     UserName = user.UserName,
                     UserEmail = user.UserEmail,
                     UserHp = user.UserHp,
