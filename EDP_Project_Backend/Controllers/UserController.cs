@@ -213,7 +213,7 @@ namespace EDP_Project_Backend.Controllers
             return Ok(data);
         }
 
-        // Accepts id of the perk that needs to be deleted in the parameter
+        // Accepts id of the user that needs to be deleted in the parameter
         [HttpDelete("remove-account")]
         public IActionResult BanUser()
         {
@@ -231,7 +231,7 @@ namespace EDP_Project_Backend.Controllers
         // Returns all the users in the db
         [HttpGet("view-users"), Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(IEnumerable<UserProfileDTO>), StatusCodes.Status200OK)]
-        public IActionResult GetAll(string? search)
+        public IActionResult GetAll(string? search, int page = 1, int pageSize = 5)
         {
             int userId = GetUserId();
             IQueryable<User> result = _context.Users.Where(x => x.Id != userId);
@@ -240,8 +240,13 @@ namespace EDP_Project_Backend.Controllers
                 result = result.Where(x => x.UserName.Contains(search));
             }
 
+            var totalCount = result.Count();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
             var userList = result
                 .OrderBy(x => x.UserName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(user => new UserViewDTO
                 {
                     Id = user.Id,
@@ -251,7 +256,14 @@ namespace EDP_Project_Backend.Controllers
                     TierName = _context.Tiers.Where(t => t.Id == user.TierId).Select(t => t.TierName).FirstOrDefault()
                 }).ToList();
 
-            return Ok(userList);
+                var response = new
+                {
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                    Users = userList
+                };
+
+            return Ok(response);
         }
 
         // For users to update their own profile
@@ -304,31 +316,19 @@ namespace EDP_Project_Backend.Controllers
 
         }
 
-        // Accepts id of the perk that needs to be deleted in the parameter
-        [HttpDelete("ban-user"), Authorize(Roles = "admin")]
-        public IActionResult BanUser(int[] idlist)
+        // Accepts id of the user that needs to be deleted in the parameter
+        [HttpDelete("ban-user/{id}"), Authorize(Roles = "admin")]
+        public IActionResult BanUser(int id)
         {
             int userId = GetUserId();
-            if (idlist == null)
+            var myUser = _context.Users.Find(id);
+            // Prevents Admin account from deleting itself
+            if (myUser == null || myUser.Id == userId)
             {
                 return NotFound();
             }
-
-            foreach (int id in idlist)
-            {
-                var userToDelete = _context.Users.Find(id);
-
-                // Checks if the user id being deleted in this iteration of the foreach loop exists
-                if (userToDelete != null)
-                {
-                    // Prevents Admin account from deleting itself
-                    if (userToDelete.Id == userId)
-                    {
-                        continue;
-                    }
-                    _context.Users.Remove(userToDelete);
-                }
-            }
+            _context.Users.Remove(myUser);
+            _context.SaveChanges();
             return Ok();
         }
 
