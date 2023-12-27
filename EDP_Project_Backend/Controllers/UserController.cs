@@ -218,7 +218,8 @@ namespace EDP_Project_Backend.Controllers
         [ProducesResponseType(typeof(IEnumerable<UserProfileDTO>), StatusCodes.Status200OK)]
         public IActionResult GetAll(string? search)
         {
-            IQueryable<User> result = _context.Users;
+            int userId = GetUserId();
+            IQueryable<User> result = _context.Users.Where(x => x.Id != userId);
             if (search != null)
             {
                 result = result.Where(x => x.UserName.Contains(search));
@@ -226,14 +227,11 @@ namespace EDP_Project_Backend.Controllers
 
             var userList = result
                 .OrderBy(x => x.UserName)
-                .Select(user => new UserProfileDTO
+                .Select(user => new UserViewDTO
                 {
-                    Id = user.Id,
                     UserName = user.UserName,
                     UserEmail = user.UserEmail,
                     UserHp = user.UserHp,
-                    TotalSpent = user.TotalSpent,
-                    TotalBookings = user.TotalBookings,
                     TierName = _context.Tiers.Where(t => t.Id == user.TierId).Select(t => t.TierName).FirstOrDefault()
                 }).ToList();
 
