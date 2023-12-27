@@ -213,6 +213,21 @@ namespace EDP_Project_Backend.Controllers
             return Ok(data);
         }
 
+        // Accepts id of the perk that needs to be deleted in the parameter
+        [HttpDelete("remove-account")]
+        public IActionResult BanUser()
+        {
+            int userId = GetUserId();
+            var myUser = _context.Users.Find(userId);
+            if (myUser == null )
+            {
+                return NotFound();
+            }
+            _context.Users.Remove(myUser);
+            _context.SaveChanges();
+            return Ok();
+        }
+
         // Returns all the users in the db
         [HttpGet("view-users"), Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(IEnumerable<UserProfileDTO>), StatusCodes.Status200OK)]
@@ -287,6 +302,34 @@ namespace EDP_Project_Backend.Controllers
 
             return Ok(myUser);
 
+        }
+
+        // Accepts id of the perk that needs to be deleted in the parameter
+        [HttpDelete("ban-user"), Authorize(Roles = "admin")]
+        public IActionResult BanUser(int[] idlist)
+        {
+            int userId = GetUserId();
+            if (idlist == null)
+            {
+                return NotFound();
+            }
+
+            foreach (int id in idlist)
+            {
+                var userToDelete = _context.Users.Find(id);
+
+                // Checks if the user id being deleted in this iteration of the foreach loop exists
+                if (userToDelete != null)
+                {
+                    // Prevents Admin account from deleting itself
+                    if (userToDelete.Id == userId)
+                    {
+                        continue;
+                    }
+                    _context.Users.Remove(userToDelete);
+                }
+            }
+            return Ok();
         }
 
 
