@@ -245,7 +245,7 @@ namespace EDP_Project_Backend.Controllers
 
             var userList = result
                 .OrderBy(x => x.UserName)
-                .Skip((page - 1) * pageSize)
+                .Skip(Math.Max(0, (page - 1) * pageSize))
                 .Take(pageSize)
                 .Select(user => new UserViewDTO
                 {
