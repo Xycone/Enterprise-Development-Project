@@ -22,6 +22,7 @@ namespace EDP_Project_Backend
             .ForMember(dest => dest.MinSpend, opt => opt.MapFrom(src => src.Perk.MinSpend))
             .ForMember(dest => dest.VoucherQuantity, opt => opt.MapFrom(src => src.Perk.VoucherQuantity))
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName));
+            CreateMap<Order, OrderDTO>();
         }
     }
 }

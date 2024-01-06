@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20231218132001_InitialCreate")]
+    [Migration("20240106153044_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -21,6 +21,26 @@ namespace EDP_Project_Backend.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<float>("OrderTotal")
+                        .HasColumnType("float");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
+                });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>
                 {
@@ -102,7 +122,7 @@ namespace EDP_Project_Backend.Migrations
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<int>("TierId")
+                    b.Property<int?>("TierId")
                         .HasColumnType("int");
 
                     b.Property<int>("TotalBookings")
@@ -190,9 +210,7 @@ namespace EDP_Project_Backend.Migrations
                 {
                     b.HasOne("EDP_Project_Backend.Models.Tier", "Tier")
                         .WithMany("Users")
-                        .HasForeignKey("TierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TierId");
 
                     b.Navigation("Tier");
                 });
