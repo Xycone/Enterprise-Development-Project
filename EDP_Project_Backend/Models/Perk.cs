@@ -10,13 +10,15 @@ namespace EDP_Project_Backend.Models
         public int Id { get; set; }
 
         // Stores discount that offer a percentage off the price
+        [Range(1, 100)]
         public int PercentageDiscount { get; set; }
 
         // Stores discount that offers a fixed value off
+        [Range(0.01, float.MaxValue)]
         public float FixedDiscount { get; set; }
 
-        // Stores min group size if this voucher is a group voucher
-        // Left blank if this voucher isnt a group voucher
+        // Stores min group size
+        [Required, Range(2, int.MaxValue)]
         public int MinGroupSize { get; set; }
 
         // Stores min spend for voucher to be applied
@@ -24,7 +26,7 @@ namespace EDP_Project_Backend.Models
         public float MinSpend { get; set;}
 
         // Number of vouchers the perk for the tier would give to the users belonging to said tier every month
-        [Required, Range(0, int.MaxValue)]
+        [Required, Range(1, int.MaxValue)]
         public int VoucherQuantity { get; set; }
 
         // Foreign key

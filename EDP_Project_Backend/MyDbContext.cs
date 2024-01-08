@@ -27,5 +27,6 @@ namespace EDP_Project_Backend
         public DbSet<User> Users { get; set; }
         public DbSet<Perk> Perks { get; set; }
         public DbSet<Voucher> Vouchers { get; set; }
+        public DbSet<Order> Orders { get; set; }
     }
 }

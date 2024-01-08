@@ -28,6 +28,15 @@ namespace EDP_Project_Backend.Controllers
             .Select(c => c.Value).SingleOrDefault());
         }
 
+        // Returns total number of tiers
+        [HttpGet("get-tiers")]
+        public IActionResult GetNumberOfTiers()
+        {
+            int numberOfTiers = _context.Tiers.Count();
+            return Ok(numberOfTiers);
+        }
+
+        // Returns all the available tiers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TierDTO>), StatusCodes.Status200OK)]
         public IActionResult GetAll(string? search)
@@ -42,6 +51,7 @@ namespace EDP_Project_Backend.Controllers
             return Ok(data);
         }
 
+        // Returns tier info of the tier by id
         [HttpGet("{id}"), Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(TierDTO), StatusCodes.Status200OK)]
         public IActionResult GetTier(int id)
@@ -61,6 +71,7 @@ namespace EDP_Project_Backend.Controllers
         public IActionResult AddTier(AddTierRequest tier)
         {
             var now = DateTime.Now;
+
             // Retrieves the current highest tier position in the db. 
             // If nothing in the db, the currentHighestTier will be given the null value
             int? currentHighestTier = _context.Tiers.Max(t => (int?)t.TierPosition);

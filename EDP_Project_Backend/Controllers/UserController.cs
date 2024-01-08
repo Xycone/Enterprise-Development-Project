@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -201,45 +202,73 @@ namespace EDP_Project_Backend.Controllers
         public IActionResult GetUserProfile()
         {
             int userId = GetUserId();
-            var user = _context.Users.Find(userId);
+            var user = _context.Users.Include(u => u.Tier).FirstOrDefault(u => u.Id == userId);
             if (user == null)
             {
                 return NotFound("User not found");
             }
 
-            var tier = _context.Tiers.FirstOrDefault(t => t.Id == user.TierId);
-
             var data = _mapper.Map<UserProfileDTO>(user);
-            // Since TierName is not a part of the user object but derived by using the tierId found in user, we add it manually
-            data.TierName = tier?.TierName;
 
             return Ok(data);
         }
 
+        // Accepts id of the user that needs to be deleted in the parameter
+        [HttpDelete("remove-account")]
+        public IActionResult BanUser()
+        {
+            int userId = GetUserId();
+            var myUser = _context.Users.Find(userId);
+            if (myUser == null )
+            {
+                return NotFound();
+            }
+            _context.Users.Remove(myUser);
+            _context.SaveChanges();
+            return Ok();
+        }
+
         // Returns all the users in the db
         [HttpGet("view-users"), Authorize(Roles = "admin")]
-        public IActionResult GetAll(string? search)
+        [ProducesResponseType(typeof(IEnumerable<UserProfileDTO>), StatusCodes.Status200OK)]
+        public IActionResult GetAll(string? search, int page = 1, int pageSize = 5)
         {
-            IQueryable<User> result = _context.Users;
+            int userId = GetUserId();
+            IQueryable<User> result = _context.Users.Where(x => x.Id != userId);
             if (search != null)
             {
                 result = result.Where(x => x.UserName.Contains(search));
             }
 
+            var totalCount = result.Count();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            if (pageSize < 0)
+            {
+                pageSize = 0;
+            }
+
             var userList = result
                 .OrderBy(x => x.UserName)
-                .Select(user => new UserProfileDTO
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(user => new UserViewDTO
                 {
                     Id = user.Id,
                     UserName = user.UserName,
                     UserEmail = user.UserEmail,
                     UserHp = user.UserHp,
-                    TotalSpent = user.TotalSpent,
-                    TotalBookings = user.TotalBookings,
                     TierName = _context.Tiers.Where(t => t.Id == user.TierId).Select(t => t.TierName).FirstOrDefault()
                 }).ToList();
 
-            return Ok(userList);
+                var response = new
+                {
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                    Users = userList
+                };
+
+            return Ok(response);
         }
 
         // For users to update their own profile
@@ -252,27 +281,60 @@ namespace EDP_Project_Backend.Controllers
             if (myUser == null)
             {
                 return NotFound();
+            }      
+
+
+            if (user.UserName != null) 
+            {
+                myUser.UserName = user.UserName.Trim();
             }
 
-            // Check if updated email already exists
-            var foundUser = _context.Users.Where(x => x.UserEmail == user.UserEmail && x.Id != userId).FirstOrDefault();
-            if (foundUser != null)
+            if (user.UserPassword != null)
             {
-                string message = "Email already exists.";
-                return BadRequest(new { message });
-            }         
+                string passwordHash = BCrypt.Net.BCrypt.HashPassword(user.UserPassword.Trim());
+                myUser.UserPassword = passwordHash;
+            }
 
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(user.UserPassword.Trim());
+            if (user.UserEmail != null)
+            {
+                // Check if updated email already exists
+                var foundUser = _context.Users.Where(x => x.UserEmail == user.UserEmail && x.Id != userId).FirstOrDefault();
+                if (foundUser != null)
+                {
+                    string message = "Email already exists.";
+                    return BadRequest(new { message });
+                }
 
-            myUser.UserName = user.UserName.Trim();
-            myUser.UserEmail = user.UserEmail.Trim().ToLower();
-            myUser.UserHp = user.UserHp.Trim();
+                myUser.UserEmail = user.UserEmail.Trim().ToLower();
+            }
+
+            if (user.UserHp != null)
+            {
+                myUser.UserHp = user.UserHp.Trim();
+            }
+            
             myUser.UpdatedAt = DateTime.Now;
 
             _context.SaveChanges();
 
             return Ok(myUser);
 
+        }
+
+        // Accepts id of the user that needs to be deleted in the parameter
+        [HttpDelete("ban-user/{id}"), Authorize(Roles = "admin")]
+        public IActionResult BanUser(int id)
+        {
+            int userId = GetUserId();
+            var myUser = _context.Users.Find(id);
+            // Prevents Admin account from deleting itself
+            if (myUser == null || myUser.Id == userId)
+            {
+                return NotFound();
+            }
+            _context.Users.Remove(myUser);
+            _context.SaveChanges();
+            return Ok();
         }
 
 
