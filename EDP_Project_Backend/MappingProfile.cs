@@ -11,6 +11,8 @@ namespace EDP_Project_Backend
             CreateMap<User, UserDTO>();
             CreateMap<User, UserBasicDTO>();
             CreateMap<User, UserProfileDTO>();
+            CreateMap<ActivityListing, ListingDTO>();
+            CreateMap<Activity, ActivityDTO>();
         }
     }
 }

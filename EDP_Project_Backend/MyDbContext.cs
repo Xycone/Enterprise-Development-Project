@@ -21,6 +21,8 @@ namespace EDP_Project_Backend
         }
 
         // Make sure to add here when new model is created
+        public DbSet<ActivityListing> ActivityListings { get; set; }
+        public DbSet<Activity> Activities { get; set; }
         public DbSet<Tier> Tiers { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Perk> Perks { get; set; }
