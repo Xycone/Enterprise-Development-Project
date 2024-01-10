@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDP_Project_Backend", "EDP_Project_Backend\EDP_Project_Backend.csproj", "{E9D97EAB-0D10-419B-B88B-A8D3B49120A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EDP_Project_Backend", "EDP_Project_Backend\EDP_Project_Backend.csproj", "{E9D97EAB-0D10-419B-B88B-A8D3B49120A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

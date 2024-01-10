@@ -3,6 +3,7 @@ using System;
 using EDP_Project_Backend;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,34 +11,16 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240107075728_CreateDB")]
+    partial class CreateDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("EDP_Project_Backend.Models.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<float>("OrderTotal")
-                        .HasColumnType("float");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Orders");
-                });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Activity", b =>
                 {

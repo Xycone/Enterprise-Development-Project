@@ -28,6 +28,14 @@ namespace EDP_Project_Backend.Controllers
             .Select(c => c.Value).SingleOrDefault());
         }
 
+        // Returns total number of tiers
+        [HttpGet("get-tiers")]
+        public IActionResult GetNumberOfTiers()
+        {
+            int numberOfTiers = _context.Tiers.Count();
+            return Ok(numberOfTiers);
+        }
+
         // Returns all the available tiers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TierDTO>), StatusCodes.Status200OK)]
