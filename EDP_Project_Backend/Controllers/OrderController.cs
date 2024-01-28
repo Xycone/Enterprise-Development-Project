@@ -24,9 +24,16 @@ namespace EDP_Project_Backend.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<OrderDTO>), StatusCodes.Status200OK)]
-        public IActionResult GetAllOrders()
+        public IActionResult GetAllOrders([FromQuery] int? userId)
         {
             IQueryable<Order> result = _context.Orders;
+
+            // Filter orders by userId if the userId parameter is provided
+            if (userId.HasValue)
+            {
+                result = result.Where(o => o.UserId == userId.Value);
+            }
+
 
             var list = result.ToList();
             IEnumerable<OrderDTO> data = list.Select(order => _mapper.Map<OrderDTO>(order));
@@ -60,7 +67,7 @@ namespace EDP_Project_Backend.Controllers
             kvp => kvp.Key,
             kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
         );
-
+                    
                 return BadRequest(new { Errors = errors });
             }
 
@@ -126,8 +133,5 @@ namespace EDP_Project_Backend.Controllers
 
             return NoContent();
         }
-
-
-
     }
 }
