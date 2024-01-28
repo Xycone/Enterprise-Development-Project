@@ -52,11 +52,11 @@ namespace EDP_Project_Backend.Controllers
         }
 
         // Returns tier info of the tier by id
-        [HttpGet("{id}"), Authorize(Roles = "admin")]
+        [HttpGet("{id}"), Authorize]
         [ProducesResponseType(typeof(TierDTO), StatusCodes.Status200OK)]
         public IActionResult GetTier(int id)
         {
-            Tier? tier = _context.Tiers.Find(id);
+            var tier = _context.Tiers.Find(id);
             if (tier == null)
             {
                 return NotFound();

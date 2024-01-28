@@ -20,17 +20,10 @@ namespace EDP_Project_Backend.Controllers
         }
 
         // Accepts the tierId that the perk(s) u are looking for belongs to in the parameter
-        [HttpGet]
+        [HttpGet("{tierid}")]
         [ProducesResponseType(typeof(IEnumerable<PerkDTO>), StatusCodes.Status200OK)]
         public IActionResult GetPerks(int tierid)
         {
-            // Check if the specified tierid exists
-            var existingTier = _context.Tiers.Find(tierid);
-
-            if (existingTier == null)
-            {
-                return NotFound();
-            }
 
             var perks = _mapper.Map<List<PerkDTO>>(_context.Perks.Where(p => p.TierId == tierid).Include(p => p.Tier).ToList());
 
@@ -61,6 +54,7 @@ namespace EDP_Project_Backend.Controllers
             var myPerk = new Perk()
             {
                 PercentageDiscount = perk.PercentageDiscount,
+                FixedDiscount = perk.FixedDiscount,
                 MinGroupSize = perk.MinGroupSize,
                 MinSpend = perk.MinSpend,
                 VoucherQuantity = perk.VoucherQuantity,
