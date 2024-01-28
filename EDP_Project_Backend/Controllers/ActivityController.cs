@@ -19,8 +19,8 @@ namespace EDP_Project_Backend.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("create-activity")]
-        public async Task<IActionResult> CreateActivity([FromBody] AddActivityRequest addActivityRequest)
+        [HttpPost("{listingId}")]
+        public async Task<IActionResult> CreateActivity(int listingId, [FromBody] AddActivityRequest addActivityRequest)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace EDP_Project_Backend.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var activityListing = await _context.ActivityListings.FindAsync(addActivityRequest.ActivityListingId);
+                var activityListing = await _context.ActivityListings.FindAsync(listingId);
 
                 if (activityListing == null)
                 {
@@ -40,7 +40,7 @@ namespace EDP_Project_Backend.Controllers
                 {
                     Date = addActivityRequest.Date,
                     AvailSpots = addActivityRequest.AvailSpots,
-                    ActivityListingId = addActivityRequest.ActivityListingId
+                    ActivityListingId = listingId
                 };
 
                 _context.Activities.Add(activity);

@@ -9,8 +9,5 @@ namespace EDP_Project_Backend.Models
 
         [Required, Range(0, 500)]
         public int AvailSpots { get; set; }
-
-        [Required]
-        public int ActivityListingId { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace EDP_Project_Backend.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("create-listing")]
+        [HttpPost]
         public async Task<IActionResult> CreateActivityListing([FromBody] AddListingRequest createListing)
         {
             if (!ModelState.IsValid)
