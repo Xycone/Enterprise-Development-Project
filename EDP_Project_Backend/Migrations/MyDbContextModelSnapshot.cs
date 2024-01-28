@@ -56,6 +56,71 @@ namespace EDP_Project_Backend.Migrations
                     b.ToTable("Perks");
                 });
 
+            modelBuilder.Entity("EDP_Project_Backend.Models.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Desc")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("activityId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("starRating")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Ticket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Complaint")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("IssueType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Tickets");
+                });
+
             modelBuilder.Entity("EDP_Project_Backend.Models.Tier", b =>
                 {
                     b.Property<int>("Id")
@@ -183,6 +248,28 @@ namespace EDP_Project_Backend.Migrations
                     b.Navigation("Tier");
                 });
 
+            modelBuilder.Entity("EDP_Project_Backend.Models.Review", b =>
+                {
+                    b.HasOne("EDP_Project_Backend.Models.User", "User")
+                        .WithMany("Reviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Ticket", b =>
+                {
+                    b.HasOne("EDP_Project_Backend.Models.User", "User")
+                        .WithMany("Tickets")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("EDP_Project_Backend.Models.User", b =>
                 {
                     b.HasOne("EDP_Project_Backend.Models.Tier", "Tier")
@@ -225,6 +312,10 @@ namespace EDP_Project_Backend.Migrations
 
             modelBuilder.Entity("EDP_Project_Backend.Models.User", b =>
                 {
+                    b.Navigation("Reviews");
+
+                    b.Navigation("Tickets");
+
                     b.Navigation("Vouchers");
                 });
 #pragma warning restore 612, 618
