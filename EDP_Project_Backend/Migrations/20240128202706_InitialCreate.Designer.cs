@@ -11,13 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-<<<<<<<< HEAD:EDP_Project_Backend/Migrations/20240107075728_CreateDB.Designer.cs
-    [Migration("20240107075728_CreateDB")]
-    partial class CreateDB
-========
-    [Migration("20240123024212_initalcreate")]
-    partial class initalcreate
->>>>>>>> origin/wayne's-stuff:EDP_Project_Backend/Migrations/20240123024212_initalcreate.Designer.cs
+    [Migration("20240128202706_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -90,6 +85,26 @@ namespace EDP_Project_Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ActivityListings");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<float>("OrderTotal")
+                        .HasColumnType("float");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>
