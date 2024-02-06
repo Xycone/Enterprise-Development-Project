@@ -54,6 +54,9 @@ namespace EDP_Project_Backend.Models
 		[JsonIgnore]
 		public List<Review>? Reviews { get; set; }
 
+		[JsonIgnore]
+		public List<CartItem>? CartItems { get; set; }
+
 		[Column(TypeName = "datetime")]
         public DateTime CreatedAt { get; set; }
 
@@ -61,7 +64,4 @@ namespace EDP_Project_Backend.Models
         public DateTime UpdatedAt { get; set; }
 
     }
-		[JsonIgnore]
-		public List<CartItem>? CartItems { get; set; }
-	}
 }
