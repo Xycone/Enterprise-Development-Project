@@ -61,4 +61,7 @@ namespace EDP_Project_Backend.Models
         public DateTime UpdatedAt { get; set; }
 
     }
+		[JsonIgnore]
+		public List<CartItem>? CartItems { get; set; }
+	}
 }

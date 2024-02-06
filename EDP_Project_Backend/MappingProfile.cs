@@ -25,6 +25,7 @@ namespace EDP_Project_Backend
             CreateMap<Order, OrderDTO>();
             CreateMap<ActivityListing, ListingDTO>();
             CreateMap<Activity, ActivityDTO>();
-        }
+			CreateMap<CartItem, CartItemDTO>();
+		}
     }
 }
