@@ -272,7 +272,7 @@ namespace EDP_Project_Backend.Controllers
         }
 
         // For users to update their own profile
-        // Takes in UserName, UserEmail and UserHp in the request body
+        // Takes in UserName, UserEmail, Password and UserHp in the request body
         [HttpPut("update-profile"), Authorize]
         public IActionResult UpdateUser(UpdateProfileRequest user)
         {
