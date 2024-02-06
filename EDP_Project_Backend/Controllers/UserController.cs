@@ -289,12 +289,6 @@ namespace EDP_Project_Backend.Controllers
                 myUser.UserName = user.UserName.Trim();
             }
 
-            if (user.UserPassword != null)
-            {
-                string passwordHash = BCrypt.Net.BCrypt.HashPassword(user.UserPassword.Trim());
-                myUser.UserPassword = passwordHash;
-            }
-
             if (user.UserEmail != null)
             {
                 // Check if updated email already exists
@@ -321,8 +315,34 @@ namespace EDP_Project_Backend.Controllers
 
         }
 
-        // Accepts id of the user that needs to be deleted in the parameter
-        [HttpDelete("ban-user/{id}"), Authorize(Roles = "admin")]
+		// For users to update their own profile
+		// Takes in UserName, UserEmail, Password and UserHp in the request body
+		[HttpPut("update-password"), Authorize]
+		public IActionResult UpdatePassword(UpdatePasswordRequest password)
+		{
+			int userId = GetUserId();
+			var myUser = _context.Users.Find(userId);
+			if (myUser == null)
+			{
+				return NotFound();
+			}
+
+
+			if (password.UserPassword != null)
+			{
+				string passwordHash = BCrypt.Net.BCrypt.HashPassword(password.UserPassword.Trim());
+				myUser.UserPassword = passwordHash;
+			}
+
+			myUser.UpdatedAt = DateTime.Now;
+
+			_context.SaveChanges();
+
+			return Ok(myUser);
+		}
+
+		// Accepts id of the user that needs to be deleted in the parameter
+		[HttpDelete("ban-user/{id}"), Authorize(Roles = "admin")]
         public IActionResult BanUser(int id)
         {
             int userId = GetUserId();
