@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240206082431_InitialCreate")]
+    [Migration("20240207164907_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -284,6 +284,10 @@ namespace EDP_Project_Backend.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("ImageFile")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("tinyint(1)");

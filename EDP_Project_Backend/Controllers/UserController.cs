@@ -281,10 +281,14 @@ namespace EDP_Project_Backend.Controllers
             if (myUser == null)
             {
                 return NotFound();
-            }      
+            }
 
+			if (user.ImageFile != null)
+			{
+                myUser.ImageFile = user.ImageFile;
+			}
 
-            if (user.UserName != null) 
+			if (user.UserName != null) 
             {
                 myUser.UserName = user.UserName.Trim();
             }

@@ -14,7 +14,9 @@
 
         public int TotalBookings { get; set; }
 
-        public int TierId { get; set; }
+		public string ImageFile { get; set; } = string.Empty;
+
+		public int TierId { get; set; }
 
         public string? TierName { get; set; } = string.Empty;
     }

@@ -134,6 +134,7 @@ namespace EDP_Project_Backend.Migrations
                     UserHp = table.Column<string>(type: "varchar(15)", maxLength: 15, nullable: false),
                     TotalSpent = table.Column<float>(type: "float", nullable: false),
                     TotalBookings = table.Column<int>(type: "int", nullable: false),
+                    ImageFile = table.Column<string>(type: "longtext", nullable: false),
                     TierId = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: false)

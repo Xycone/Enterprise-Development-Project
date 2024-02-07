@@ -14,5 +14,7 @@ namespace EDP_Project_Backend.Models
 
         [Required, MinLength(8), MaxLength(8)]
         public string UserHp { get; set; } = string.Empty;
+
+        public string ImageFile { get; set; } = string.Empty;
     }
 }

@@ -90,6 +90,7 @@ if (app.Environment.IsDevelopment())
 // Needed if u want to make use of the react front end thing(DO NOT DELETE PLS)
 app.UseHttpsRedirection();
 app.UseCors();
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

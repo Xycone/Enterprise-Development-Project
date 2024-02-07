@@ -33,9 +33,12 @@ namespace EDP_Project_Backend.Models
         [Range(0, int.MaxValue)]
         public int TotalBookings { get; set; }
 
-        // Foreign key
-        // User belongs to a tier
-        public int? TierId { get; set; }
+        // storing url to user profile pic
+        public string? ImageFile { get; set; } = string.Empty;
+
+		// Foreign key
+		// User belongs to a tier
+		public int? TierId { get; set; }
         // Navigation property to represent the one-to-many relationship
         public Tier? Tier { get; set; }
 

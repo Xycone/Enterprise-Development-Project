@@ -282,6 +282,10 @@ namespace EDP_Project_Backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
+                    b.Property<string>("ImageFile")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("tinyint(1)");
 
