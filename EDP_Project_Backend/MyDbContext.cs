@@ -1,4 +1,5 @@
-﻿using EDP_Project_Backend.Models;
+﻿using EDP_Project_Backend.BackgroundJobs.BackgroundJobsModels;
+using EDP_Project_Backend.Models;
 using Microsoft.EntityFrameworkCore;
 namespace EDP_Project_Backend
 {
@@ -19,6 +20,9 @@ namespace EDP_Project_Backend
                 optionsBuilder.UseMySQL(connectionString);
             }
         }
+
+        // Logging tables for background jobs (please do not touch)
+        public DbSet<AllocateVoucherLog> AllocateVoucherLog { get; set; }
 
         // Make sure to add here when new model is created
         public DbSet<ActivityListing> ActivityListings { get; set; }

@@ -37,6 +37,20 @@ namespace EDP_Project_Backend.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "AllocateVoucherLog",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AllocateVoucherLog", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
@@ -134,7 +148,7 @@ namespace EDP_Project_Backend.Migrations
                     UserHp = table.Column<string>(type: "varchar(15)", maxLength: 15, nullable: false),
                     TotalSpent = table.Column<float>(type: "float", nullable: false),
                     TotalBookings = table.Column<int>(type: "int", nullable: false),
-                    ImageFile = table.Column<string>(type: "longtext", nullable: false),
+                    ImageFile = table.Column<string>(type: "longtext", nullable: true),
                     TierId = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: false)
@@ -301,6 +315,9 @@ namespace EDP_Project_Backend.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Activities");
+
+            migrationBuilder.DropTable(
+                name: "AllocateVoucherLog");
 
             migrationBuilder.DropTable(
                 name: "CartItems");

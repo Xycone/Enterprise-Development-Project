@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using AutoMapper;
+using EDP_Project_Backend.BackgroundJobs;
+using EDP_Project_Backend.Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +54,11 @@ IMapper mapper = mappingConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 builder.Services.AddControllers();
+
+// Background Jobs
+builder.Services.AddScoped<allocateVouchers>();
+builder.Services.AddHostedService<VoucherAllocationService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

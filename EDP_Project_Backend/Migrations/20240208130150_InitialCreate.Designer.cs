@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240207164907_InitialCreate")]
+    [Migration("20240208130150_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -21,6 +21,20 @@ namespace EDP_Project_Backend.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("EDP_Project_Backend.BackgroundJobs.BackgroundJobsModels.AllocateVoucherLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AllocateVoucherLog");
+                });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Activity", b =>
                 {
@@ -286,7 +300,6 @@ namespace EDP_Project_Backend.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("ImageFile")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsAdmin")

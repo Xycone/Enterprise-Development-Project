@@ -19,6 +19,20 @@ namespace EDP_Project_Backend.Migrations
                 .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("EDP_Project_Backend.BackgroundJobs.BackgroundJobsModels.AllocateVoucherLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AllocateVoucherLog");
+                });
+
             modelBuilder.Entity("EDP_Project_Backend.Models.Activity", b =>
                 {
                     b.Property<int>("Id")
@@ -283,7 +297,6 @@ namespace EDP_Project_Backend.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("ImageFile")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsAdmin")
