@@ -11,6 +11,7 @@ namespace EDP_Project_Backend
             CreateMap<User, UserBasicDTO>();
             // Maps the tierName from the tier object included tgt with the user
             CreateMap<User, UserProfileDTO>().ForMember(dest => dest.TierName, opt => opt.MapFrom(src => src.Tier.TierName)); ;
+            CreateMap<User, UserProfilePicture>();
             CreateMap<Tier, TierDTO>();
             // Maps the tierName from the tier object included tgt with the perk 
             CreateMap<Perk, PerkDTO>().ForMember(dest => dest.TierName, opt => opt.MapFrom(src => src.Tier.TierName));
