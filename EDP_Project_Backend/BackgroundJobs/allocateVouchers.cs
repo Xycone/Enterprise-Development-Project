@@ -54,15 +54,19 @@ namespace EDP_Project_Backend.Hangfire
 
 								foreach (var perk in perkList)
 								{
-									var voucher = new Voucher
+									for (int i = 0; i < perk.VoucherQuantity; i++)
 									{
-										DiscountExpiry = DateTime.Now.AddMonths(1),
-										UserId = user.Id,
-										PerkId = perk.Id,
-										CreatedAt = DateTime.Now,
-									};
+										var voucher = new Voucher
+										{
+											DiscountExpiry = DateTime.Now.AddMonths(1),
+											UserId = user.Id,
+											PerkId = perk.Id,
+											CreatedAt = DateTime.Now,
+										};
 
-									_context.Vouchers.Add(voucher);
+										_context.Vouchers.Add(voucher);
+									}
+
 									_context.SaveChanges();
 								}
 
@@ -105,15 +109,19 @@ namespace EDP_Project_Backend.Hangfire
 
 							foreach (var perk in perkList)
 							{
-								var voucher = new Voucher
+								for (int i = 0; i < perk.VoucherQuantity; i++)
 								{
-									DiscountExpiry = DateTime.Now.AddMonths(1),
-									UserId = user.Id,
-									PerkId = perk.Id,
-									CreatedAt = DateTime.Now,
-								};
+									var voucher = new Voucher
+									{
+										DiscountExpiry = DateTime.Now.AddMonths(1),
+										UserId = user.Id,
+										PerkId = perk.Id,
+										CreatedAt = DateTime.Now,
+									};
 
-								_context.Vouchers.Add(voucher);
+									_context.Vouchers.Add(voucher);
+								}
+
 								_context.SaveChanges();
 							}
 
