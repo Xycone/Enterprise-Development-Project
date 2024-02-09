@@ -62,6 +62,7 @@ namespace EDP_Project_Backend.Hangfire
 											UserId = user.Id,
 											PerkId = perk.Id,
 											CreatedAt = DateTime.Now,
+											UpdatedAt = DateTime.Now,
 										};
 
 										_context.Vouchers.Add(voucher);
@@ -117,6 +118,7 @@ namespace EDP_Project_Backend.Hangfire
 										UserId = user.Id,
 										PerkId = perk.Id,
 										CreatedAt = DateTime.Now,
+										UpdatedAt = DateTime.Now,
 									};
 
 									_context.Vouchers.Add(voucher);
