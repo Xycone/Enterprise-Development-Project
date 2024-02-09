@@ -347,9 +347,9 @@ namespace EDP_Project_Backend.Controllers
 			}
 
 
-			if (password.UserPassword != null)
+			if (password.Password != null)
 			{
-				string passwordHash = BCrypt.Net.BCrypt.HashPassword(password.UserPassword.Trim());
+				string passwordHash = BCrypt.Net.BCrypt.HashPassword(password.Password.Trim());
 				myUser.UserPassword = passwordHash;
 			}
 
