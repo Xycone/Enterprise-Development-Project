@@ -105,7 +105,7 @@ namespace EDP_Project_Backend.Controllers
 			{
 				PriceData = new SessionLineItemPriceDataOptions
 				{
-					Currency = "usd",
+					Currency = "sgd",
 					ProductData = new SessionLineItemPriceDataProductDataOptions
 					{
 						Name = "Total Amount Payable"
@@ -114,7 +114,6 @@ namespace EDP_Project_Backend.Controllers
 				},
 				Quantity = 1 // Only one line item for total amount payable
 			});
-
 
 
 			var options = new SessionCreateOptions
@@ -134,7 +133,7 @@ namespace EDP_Project_Backend.Controllers
 			var service = new SessionService();
             var session = service.Create(options);
 
-            return Ok(new { sessionId = session.Id });
+            return Ok(new { sessionId = session.Id, appliedVoucher, cartItems });
         }
 
         // Add more actions as needed, such as webhook handler for payment events
