@@ -72,7 +72,8 @@ namespace EDP_Project_Backend.Controllers
 					Total_Price = CartItem.Quantity * CartItem.Price,
 					CreatedAt = now,
 					UpdatedAt = now,
-					UserId = userId
+					UserId = userId,
+					ActivityId = CartItem.ActivityId,
 				};
 
 				_context.CartItems.Add(myCartItem);

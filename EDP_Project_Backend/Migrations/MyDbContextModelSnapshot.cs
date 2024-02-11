@@ -98,6 +98,9 @@ namespace EDP_Project_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("ActivityId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
@@ -122,6 +125,8 @@ namespace EDP_Project_Backend.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
 
                     b.HasIndex("UserId");
 
@@ -382,11 +387,19 @@ namespace EDP_Project_Backend.Migrations
 
             modelBuilder.Entity("EDP_Project_Backend.Models.CartItem", b =>
                 {
+                    b.HasOne("EDP_Project_Backend.Models.Activity", "Activity")
+                        .WithMany("CartItems")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("EDP_Project_Backend.Models.User", "User")
                         .WithMany("CartItems")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Activity");
 
                     b.Navigation("User");
                 });
@@ -450,6 +463,11 @@ namespace EDP_Project_Backend.Migrations
                     b.Navigation("Perk");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Activity", b =>
+                {
+                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>
