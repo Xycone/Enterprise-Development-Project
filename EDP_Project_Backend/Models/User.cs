@@ -6,6 +6,7 @@ namespace EDP_Project_Backend.Models
 {
     public class User
     {
+
         public int Id { get; set; }
 
         public Boolean IsAdmin {  get; set; }
@@ -32,9 +33,12 @@ namespace EDP_Project_Backend.Models
         [Range(0, int.MaxValue)]
         public int TotalBookings { get; set; }
 
-        // Foreign key
-        // User belongs to a tier
-        public int? TierId { get; set; }
+        // storing url to user profile pic
+        public string? ImageFile { get; set; } = string.Empty;
+
+		// Foreign key
+		// User belongs to a tier
+		public int? TierId { get; set; }
         // Navigation property to represent the one-to-many relationship
         public Tier? Tier { get; set; }
 
@@ -43,10 +47,24 @@ namespace EDP_Project_Backend.Models
         [JsonIgnore]
         public List<Voucher>? Vouchers { get; set; }
 
-        [Column(TypeName = "datetime")]
+		// Navigation property to represent the one-to-many relationship
+		// Represent the User's relationship to the tickets class
+		[JsonIgnore]
+		public List<Ticket>? Tickets { get; set; }
+
+		// Navigation property to represent the one-to-many relationship
+		// Represent the User's relationship to the reviews class
+		[JsonIgnore]
+		public List<Review>? Reviews { get; set; }
+
+		[JsonIgnore]
+		public List<CartItem>? CartItems { get; set; }
+
+		[Column(TypeName = "datetime")]
         public DateTime CreatedAt { get; set; }
 
         [Column(TypeName = "datetime")]
         public DateTime UpdatedAt { get; set; }
+
     }
 }

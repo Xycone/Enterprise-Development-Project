@@ -29,17 +29,17 @@ namespace EDP_Project_Backend.Controllers
 
         // User
 
-        // Retrieve all the vouchers (with voucher info) that belongs to the authorized user
-        [HttpGet("GetMine"), Authorize]
+        // Retrieve all the non expired vouchers (with voucher info) that belongs to the authorized user
+        [HttpGet("getMine"), Authorize]
         [ProducesResponseType(typeof(IEnumerable<VoucherDTO>), StatusCodes.Status200OK)]
         public IActionResult GetMine()
         {
             int userId = GetUserId();
 
-            IQueryable<Voucher> result = _context.Vouchers.Include(v => v.User).Include(v => v.Perk).Where(v => v.UserId == userId);
+            IQueryable<Voucher> result = _context.Vouchers.Include(v => v.Perk).Where(v => v.UserId == userId && v.DiscountExpiry > DateTime.Now);
             var list = result.OrderBy(x => x.CreatedAt).ToList();
 
-            IEnumerable<VoucherDTO> data = list.Select(v => _mapper.Map<VoucherDTO>(v));
+            IEnumerable<UserVoucherDTO> data = list.Select(v => _mapper.Map<UserVoucherDTO>(v));
             return Ok(data);
         }
 

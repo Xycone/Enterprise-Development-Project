@@ -3,6 +3,7 @@ using System;
 using EDP_Project_Backend;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240209183726_a")]
+    partial class a
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,12 +82,18 @@ namespace EDP_Project_Backend.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");
 
+                    b.Property<int>("Gprice")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
                     b.Property<int>("Nprice")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Uprice")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -372,7 +381,7 @@ namespace EDP_Project_Backend.Migrations
             modelBuilder.Entity("EDP_Project_Backend.Models.Activity", b =>
                 {
                     b.HasOne("EDP_Project_Backend.Models.ActivityListing", "ActivityListing")
-                        .WithMany()
+                        .WithMany("Activities")
                         .HasForeignKey("ActivityListingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -450,6 +459,11 @@ namespace EDP_Project_Backend.Migrations
                     b.Navigation("Perk");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.ActivityListing", b =>
+                {
+                    b.Navigation("Activities");
                 });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>

@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -173,8 +174,23 @@ namespace EDP_Project_Backend.Controllers
             return Ok(new { user, accessToken });
         }
 
-        // Used to retrieve user info stored in claims
-        [HttpGet("auth"), Authorize]
+        [HttpGet("profile-picture"), Authorize]
+		[ProducesResponseType(typeof(IEnumerable<UserProfilePicture>), StatusCodes.Status200OK)]
+		public async Task<IActionResult> GetUserProfileImage()
+		{
+			int userId = GetUserId();
+			var user = _context.Users.Include(u => u.Tier).FirstOrDefault(u => u.Id == userId);
+			if (user == null)
+			{
+				return NotFound("User not found");
+			}
+			var data = _mapper.Map<UserProfilePicture>(user);
+
+            return Ok(data);
+		}
+
+		// Used to retrieve user info stored in claims
+		[HttpGet("auth"), Authorize]
         [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
         public IActionResult Auth()
         {
@@ -213,7 +229,6 @@ namespace EDP_Project_Backend.Controllers
             return Ok(data);
         }
 
-        // Accepts id of the user that needs to be deleted in the parameter
         [HttpDelete("remove-account")]
         public IActionResult BanUser()
         {
@@ -272,7 +287,7 @@ namespace EDP_Project_Backend.Controllers
         }
 
         // For users to update their own profile
-        // Takes in UserName, UserEmail and UserHp in the request body
+        // Takes in UserName, UserEmail, Password and UserHp in the request body
         [HttpPut("update-profile"), Authorize]
         public IActionResult UpdateUser(UpdateProfileRequest user)
         {
@@ -281,18 +296,16 @@ namespace EDP_Project_Backend.Controllers
             if (myUser == null)
             {
                 return NotFound();
-            }      
-
-
-            if (user.UserName != null) 
-            {
-                myUser.UserName = user.UserName.Trim();
             }
 
-            if (user.UserPassword != null)
+			if (user.ImageFile != null)
+			{
+                myUser.ImageFile = user.ImageFile;
+			}
+
+			if (user.UserName != null) 
             {
-                string passwordHash = BCrypt.Net.BCrypt.HashPassword(user.UserPassword.Trim());
-                myUser.UserPassword = passwordHash;
+                myUser.UserName = user.UserName.Trim();
             }
 
             if (user.UserEmail != null)
@@ -321,8 +334,34 @@ namespace EDP_Project_Backend.Controllers
 
         }
 
-        // Accepts id of the user that needs to be deleted in the parameter
-        [HttpDelete("ban-user/{id}"), Authorize(Roles = "admin")]
+		// For users to update their own profile
+		// Takes in UserName, UserEmail, Password and UserHp in the request body
+		[HttpPut("update-password"), Authorize]
+		public IActionResult UpdatePassword(UpdatePasswordRequest password)
+		{
+			int userId = GetUserId();
+			var myUser = _context.Users.Find(userId);
+			if (myUser == null)
+			{
+				return NotFound();
+			}
+
+
+			if (password.Password != null)
+			{
+				string passwordHash = BCrypt.Net.BCrypt.HashPassword(password.Password.Trim());
+				myUser.UserPassword = passwordHash;
+			}
+
+			myUser.UpdatedAt = DateTime.Now;
+
+			_context.SaveChanges();
+
+			return Ok(myUser);
+		}
+
+		// Accepts id of the user that needs to be deleted in the parameter
+		[HttpDelete("ban-user/{id}"), Authorize(Roles = "admin")]
         public IActionResult BanUser(int id)
         {
             int userId = GetUserId();
