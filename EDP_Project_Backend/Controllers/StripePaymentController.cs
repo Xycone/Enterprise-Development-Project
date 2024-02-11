@@ -118,15 +118,20 @@ namespace EDP_Project_Backend.Controllers
 
 
 			var options = new SessionCreateOptions
-            {
-                PaymentMethodTypes = new List<string> { "card" },
-                LineItems = lineItems,
-                Mode = "payment",
-                SuccessUrl = "http://localhost:3000/success",
-                CancelUrl = "http://localhost:3000/cancel",
-            };
+			{
+				PaymentMethodTypes = new List<string>
+				{
+					"card",
+					"grabpay",
+					"paynow",
+				},
+				LineItems = lineItems,
+				Mode = "payment",
+				SuccessUrl = "http://localhost:3000/success",
+				CancelUrl = "http://localhost:3000/cart",
+			};
 
-            var service = new SessionService();
+			var service = new SessionService();
             var session = service.Create(options);
 
             return Ok(new { sessionId = session.Id });
