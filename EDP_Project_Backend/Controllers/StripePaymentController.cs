@@ -7,6 +7,7 @@ using Stripe.Checkout;
 using Stripe.Issuing;
 using System.Security.Claims;
 using AutoMapper;
+using Newtonsoft.Json;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -126,7 +127,7 @@ namespace EDP_Project_Backend.Controllers
 				},
 				LineItems = lineItems,
 				Mode = "payment",
-				SuccessUrl = "http://localhost:3000/success",
+				SuccessUrl = "http://localhost:3000/success?" + "&appliedVoucher=" + appliedVoucher + "&cartItems=" + JsonConvert.SerializeObject(cartItems),
 				CancelUrl = "http://localhost:3000/cart",
 			};
 
@@ -136,6 +137,28 @@ namespace EDP_Project_Backend.Controllers
             return Ok(new { sessionId = session.Id, appliedVoucher, cartItems });
         }
 
-        // Add more actions as needed, such as webhook handler for payment events
-    }
+		// Add more actions as needed, such as webhook handler for payment events
+		[HttpPost]
+		[Route("stripe-webhook")]
+		public async Task<IActionResult> StripeWebhook()
+		{
+			// Parse the incoming webhook event
+			var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+			var stripeEvent = EventUtility.ParseEvent(json);
+
+			// Handle the event based on its type
+			if (stripeEvent.Type == Events.PaymentIntentSucceeded)
+			{
+				// Payment was successful, perform actions accordingly
+				var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+				var paymentIntentId = paymentIntent.Id;
+
+				// Update your database, fulfill orders, etc.
+				// Example: Update order status to "Paid"
+			}
+
+			// Return a response to acknowledge receipt of the event
+			return Ok();
+		}
+	}
 }
