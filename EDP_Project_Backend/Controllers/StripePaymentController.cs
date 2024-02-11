@@ -8,6 +8,8 @@ using Stripe.Issuing;
 using System.Security.Claims;
 using AutoMapper;
 using Newtonsoft.Json;
+using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EDP_Project_Backend.Controllers
 {
@@ -16,12 +18,10 @@ namespace EDP_Project_Backend.Controllers
     public class StripePaymentController : ControllerBase
     {
 		private readonly MyDbContext _context;
-		private readonly IMapper _mapper;
 
         public StripePaymentController(MyDbContext context, IMapper mapper)
         {
             _context = context;
-            _mapper = mapper;
         }
 
 		private int GetUserId()
@@ -34,11 +34,13 @@ namespace EDP_Project_Backend.Controllers
 		private readonly string StripeSecretKey = "sk_test_51OdgVvEFMXlO8edaRRR5R3dq7CPNvWDvoYKsrUWmSjVmnhbB7ad2JFUV2RT6vtiKzjpHquxy08TwSdo6Isvlm3XL00GrEsctoZ"; // Replace with your Stripe secret key
 
         [HttpPost]
+		[Authorize]
         [Route("create-checkout-session")]
         public ActionResult CreateCheckoutSession([FromBody] CheckoutRequest request)
         {
 			List<StripeItems> cartItems = request.SelectedCartItems;
 			int? appliedVoucher = request.SelectedVoucherId;
+			var id = GetUserId();
 
 			// Initialize Stripe with your secret key
 			StripeConfiguration.ApiKey = StripeSecretKey;
@@ -60,8 +62,7 @@ namespace EDP_Project_Backend.Controllers
 
 			if (appliedVoucher.HasValue)
             {
-                var id = GetUserId();
-                var voucher = _context.Vouchers.FirstOrDefault(v => v.UserId == id && v.Id == appliedVoucher);
+				var voucher = _context.Vouchers.FirstOrDefault(v => v.UserId == id && v.Id == appliedVoucher);
 
 				// Checks if the voucher applied actually belongs to the user logged in
 				if (voucher == null)
@@ -71,7 +72,7 @@ namespace EDP_Project_Backend.Controllers
                 }
 
 
-				// Retrieve the vocuher's associated perk
+				// Retrieve the voucher's associated perk
 				var voucherInfo = _context.Perks.FirstOrDefault(p => p.Id == voucher.PerkId);
 
 				if (voucherInfo == null)
@@ -129,12 +130,20 @@ namespace EDP_Project_Backend.Controllers
 				Mode = "payment",
 				SuccessUrl = "http://localhost:3000/success?" + "&appliedVoucher=" + appliedVoucher + "&cartItems=" + JsonConvert.SerializeObject(cartItems),
 				CancelUrl = "http://localhost:3000/cart",
+				Metadata = new Dictionary<string, string>
+				{
+					{ "appliedVoucher", appliedVoucher?.ToString() },
+					{ "cartItems", JsonConvert.SerializeObject(cartItems) },
+					{ "amountPayable", discountAmount.ToString() },
+					{ "userId", id.ToString() }
+				}
 			};
 
 			var service = new SessionService();
             var session = service.Create(options);
 
-            return Ok(new { sessionId = session.Id, appliedVoucher, cartItems });
+
+			return Ok(new { sessionId = session.Id, appliedVoucher, cartItems });
         }
 
 		// Add more actions as needed, such as webhook handler for payment events
@@ -147,14 +156,49 @@ namespace EDP_Project_Backend.Controllers
 			var stripeEvent = EventUtility.ParseEvent(json);
 
 			// Handle the event based on its type
-			if (stripeEvent.Type == Events.PaymentIntentSucceeded)
+			if (stripeEvent.Type == Events.CheckoutSessionCompleted)
 			{
-				// Payment was successful, perform actions accordingly
-				var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-				var paymentIntentId = paymentIntent.Id;
+				var session = stripeEvent.Data.Object as Session;
 
-				// Update your database, fulfill orders, etc.
-				// Example: Update order status to "Paid"
+				if (session != null)
+				{
+					// Retrieve metadata from the Stripe event
+					var metadata = session.Metadata;
+					var appliedVoucher = metadata["appliedVoucher"];
+					var cartItemsJson = metadata["cartItems"];
+					var id = metadata["userId"];
+					var cartItems = JsonConvert.DeserializeObject<List<StripeItems>>(cartItemsJson);
+					var totalSpendings = cartItems.Sum(item => item.Price * item.Quantity);
+					var totalBookings = cartItems.Sum(item => item.Quantity);
+					
+
+					// Updates total spendings and total bookings
+					var user = _context.Users.Find(Convert.ToInt32(id));
+					if (user != null)
+					{
+						user.TotalSpent += totalSpendings;
+						user.TotalBookings += totalBookings;
+					}
+					_context.SaveChanges();
+
+					// Removes used voucher from db
+					if (appliedVoucher != null)
+					{
+						var myVoucher = _context.Vouchers.Find(Convert.ToInt32(appliedVoucher));
+						if (myVoucher != null)
+						{
+							_context.Vouchers.Remove(myVoucher);
+						}
+						_context.SaveChanges();
+					}
+
+
+
+
+
+
+				}
+
 			}
 
 			// Return a response to acknowledge receipt of the event
