@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240107075728_CreateDB")]
-    partial class CreateDB
+    [Migration("20240210082817_create")]
+    partial class create
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,9 +68,6 @@ namespace EDP_Project_Backend.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");
 
-                    b.Property<int>("Gprice")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -79,12 +76,29 @@ namespace EDP_Project_Backend.Migrations
                     b.Property<int>("Nprice")
                         .HasColumnType("int");
 
-                    b.Property<int>("Uprice")
+                    b.HasKey("Id");
+
+                    b.ToTable("ActivityListings");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<float>("OrderTotal")
+                        .HasColumnType("float");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActivityListings");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>
@@ -243,7 +257,7 @@ namespace EDP_Project_Backend.Migrations
             modelBuilder.Entity("EDP_Project_Backend.Models.Activity", b =>
                 {
                     b.HasOne("EDP_Project_Backend.Models.ActivityListing", "ActivityListing")
-                        .WithMany("Activities")
+                        .WithMany()
                         .HasForeignKey("ActivityListingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -288,11 +302,6 @@ namespace EDP_Project_Backend.Migrations
                     b.Navigation("Perk");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("EDP_Project_Backend.Models.ActivityListing", b =>
-                {
-                    b.Navigation("Activities");
                 });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>

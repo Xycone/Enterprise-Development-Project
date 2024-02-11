@@ -19,17 +19,10 @@ namespace EDP_Project_Backend.Models
         public string Description { get; set; } = string.Empty;
 
         [Required, Range(0, 500)]
-        public int Gprice { get; set; }
-
-        [Required, Range(0, 500)]
-        public int Uprice { get; set; }
-
-        [Required, Range(0, 500)]
         public int Nprice { get; set; }
 
         [Required, Range(0, 500)]
         public int Capacity { get; set; }
 
-        public List<Activity> Activities { get; set; }
     }
 }

@@ -46,8 +46,6 @@ namespace EDP_Project_Backend.Controllers
                 _context.Activities.Add(activity);
                 await _context.SaveChangesAsync();
 
-                // Automatically associate the newly created activity with the activity listing
-                activityListing.Activities.Add(activity);
                 await _context.SaveChangesAsync();
 
                 return Ok("Activity created and added to the listing successfully");

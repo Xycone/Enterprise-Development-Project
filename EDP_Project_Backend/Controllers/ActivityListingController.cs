@@ -34,11 +34,8 @@ namespace EDP_Project_Backend.Controllers
                     Address = createListing.Address,
                     Category = createListing.Category,
                     Description = createListing.Description,
-                    Gprice = createListing.Gprice,
-                    Uprice = createListing.Uprice,
                     Nprice = createListing.Nprice,
                     Capacity = createListing.Capacity,
-                    Activities = new List<Activity>() // Creating an empty Activities list
                 };
                 Console.WriteLine(activityListing);
                 _context.ActivityListings.Add(activityListing);
@@ -119,8 +116,6 @@ namespace EDP_Project_Backend.Controllers
                 listingToUpdate.Address = updatedListingRequest.Address;
                 listingToUpdate.Category = updatedListingRequest.Category;
                 listingToUpdate.Description = updatedListingRequest.Description;
-                listingToUpdate.Gprice = updatedListingRequest.Gprice;
-                listingToUpdate.Uprice = updatedListingRequest.Uprice;
                 listingToUpdate.Nprice = updatedListingRequest.Nprice;
                 listingToUpdate.Capacity = updatedListingRequest.Capacity;
 

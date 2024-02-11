@@ -19,26 +19,6 @@ namespace EDP_Project_Backend.Migrations
                 .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("EDP_Project_Backend.Models.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<float>("OrderTotal")
-                        .HasColumnType("float");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Orders");
-                });
-
             modelBuilder.Entity("EDP_Project_Backend.Models.Activity", b =>
                 {
                     b.Property<int>("Id")
@@ -85,9 +65,6 @@ namespace EDP_Project_Backend.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");
 
-                    b.Property<int>("Gprice")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -96,12 +73,29 @@ namespace EDP_Project_Backend.Migrations
                     b.Property<int>("Nprice")
                         .HasColumnType("int");
 
-                    b.Property<int>("Uprice")
+                    b.HasKey("Id");
+
+                    b.ToTable("ActivityListings");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<float>("OrderTotal")
+                        .HasColumnType("float");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActivityListings");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>
@@ -260,7 +254,7 @@ namespace EDP_Project_Backend.Migrations
             modelBuilder.Entity("EDP_Project_Backend.Models.Activity", b =>
                 {
                     b.HasOne("EDP_Project_Backend.Models.ActivityListing", "ActivityListing")
-                        .WithMany("Activities")
+                        .WithMany()
                         .HasForeignKey("ActivityListingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -305,11 +299,6 @@ namespace EDP_Project_Backend.Migrations
                     b.Navigation("Perk");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("EDP_Project_Backend.Models.ActivityListing", b =>
-                {
-                    b.Navigation("Activities");
                 });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>
