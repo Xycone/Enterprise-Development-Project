@@ -56,7 +56,27 @@ namespace EDP_Project_Backend.Controllers
 			}
 		}
 
-		[HttpPost("AddCartItems"), Authorize]
+        [HttpGet("GetAllCartItems")]
+        [ProducesResponseType(typeof(IEnumerable<CartItemDTO>), StatusCodes.Status200OK)]
+        public IActionResult GetAllCartItems()
+        {
+            try
+            {
+                IQueryable<CartItem> result = _context.CartItems.Include(t => t.User);
+                // No filtering by UserId
+                var list = result.OrderByDescending(x => x.CreatedAt).ToList();
+                IEnumerable<CartItemDTO> data = list.Select(t => _mapper.Map<CartItemDTO>(t));
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error when getting all CartItems");
+                return StatusCode(500);
+            }
+        }
+
+
+        [HttpPost("AddCartItems"), Authorize]
 		[ProducesResponseType(typeof(CartItemDTO), StatusCodes.Status200OK)]
 		public IActionResult AddCartItem(AddCartItemRequest CartItem)
 		{
