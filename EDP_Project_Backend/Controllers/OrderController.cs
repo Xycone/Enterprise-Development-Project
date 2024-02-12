@@ -57,6 +57,15 @@ namespace EDP_Project_Backend.Controllers
             return Ok(orderDTO);
         }
 
+        [HttpGet("user/{userId}")]
+        [ProducesResponseType(typeof(IEnumerable<OrderDTO>), StatusCodes.Status200OK)]
+        public IActionResult GetOrdersByUserId(int userId)
+        {
+            var orders = _context.Orders.Where(o => o.UserId == userId).ToList();
+            var orderDTOs = orders.Select(order => _mapper.Map<OrderDTO>(order));
+            return Ok(orderDTOs);
+        }
+
         [HttpPost]
         [ProducesResponseType(typeof(OrderDTO), StatusCodes.Status200OK)]
         public IActionResult AddOrder([FromBody] AddOrderRequest orderRequest)
