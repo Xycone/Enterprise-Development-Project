@@ -35,5 +35,6 @@ namespace EDP_Project_Backend
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Review> Reviews { get; set; }
 		public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Notice> Notices { get; set; }
 	}
 }

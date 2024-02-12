@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240211205602_a")]
-    partial class a
+    [Migration("20240212204152_c")]
+    partial class c
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,6 +82,9 @@ namespace EDP_Project_Backend.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");
 
+                    b.Property<string>("ImageFile")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -136,16 +139,42 @@ namespace EDP_Project_Backend.Migrations
                     b.ToTable("CartItems");
                 });
 
+            modelBuilder.Entity("EDP_Project_Backend.Models.Notice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notices");
+                });
+
             modelBuilder.Entity("EDP_Project_Backend.Models.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<string>("ActivityName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime");
 
-                    b.Property<float>("OrderTotal")
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<float>("TotalPrice")
                         .HasColumnType("float");
 
                     b.Property<int>("UserId")
@@ -199,6 +228,9 @@ namespace EDP_Project_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("ActivityId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");
 
@@ -213,13 +245,12 @@ namespace EDP_Project_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("activityId")
-                        .HasColumnType("int");
-
                     b.Property<int>("starRating")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
 
                     b.HasIndex("UserId");
 
@@ -420,11 +451,19 @@ namespace EDP_Project_Backend.Migrations
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Review", b =>
                 {
+                    b.HasOne("EDP_Project_Backend.Models.Activity", "Activity")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("EDP_Project_Backend.Models.User", "User")
                         .WithMany("Reviews")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Activity");
 
                     b.Navigation("User");
                 });
@@ -471,6 +510,8 @@ namespace EDP_Project_Backend.Migrations
             modelBuilder.Entity("EDP_Project_Backend.Models.Activity", b =>
                 {
                     b.Navigation("CartItems");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Perk", b =>

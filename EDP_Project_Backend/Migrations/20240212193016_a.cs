@@ -7,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace EDP_Project_Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class Ic : Migration
+    public partial class a : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,7 +26,8 @@ namespace EDP_Project_Backend.Migrations
                     Category = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     Description = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false),
                     Nprice = table.Column<int>(type: "int", nullable: false),
-                    Capacity = table.Column<int>(type: "int", nullable: false)
+                    Capacity = table.Column<int>(type: "int", nullable: false),
+                    ImageFile = table.Column<string>(type: "longtext", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -55,8 +56,10 @@ namespace EDP_Project_Backend.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    OrderDate = table.Column<DateTime>(type: "datetime", nullable: false),
-                    OrderTotal = table.Column<float>(type: "float", nullable: false)
+                    ActivityName = table.Column<string>(type: "longtext", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    TotalPrice = table.Column<float>(type: "float", nullable: false),
+                    OrderDate = table.Column<DateTime>(type: "datetime", nullable: false)
                 },
                 constraints: table =>
                 {
