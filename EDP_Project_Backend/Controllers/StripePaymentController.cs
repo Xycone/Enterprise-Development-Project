@@ -85,7 +85,7 @@ namespace EDP_Project_Backend.Controllers
 					return BadRequest("Total cart value does not meet the minimum spend requirement for the voucher to apply.");
 				}
 
-                if (totalQuantityInCart <= voucherInfo.MinGroupSize)
+                if (totalQuantityInCart < voucherInfo.MinGroupSize)
                 {
                     return BadRequest("Total cart item quantity does not meet the minimum group size for the voucher to apply.");
                 }
