@@ -85,7 +85,7 @@ namespace EDP_Project_Backend.Controllers
 					return BadRequest("Total cart value does not meet the minimum spend requirement for the voucher to apply.");
 				}
 
-                if (totalQuantityInCart <= voucherInfo.MinGroupSize)
+                if (totalQuantityInCart < voucherInfo.MinGroupSize)
                 {
                     return BadRequest("Total cart item quantity does not meet the minimum group size for the voucher to apply.");
                 }
@@ -170,10 +170,19 @@ namespace EDP_Project_Backend.Controllers
 					var cartItems = JsonConvert.DeserializeObject<List<StripeItems>>(cartItemsJson);
 					var totalSpendings = cartItems.Sum(item => item.Price * item.Quantity);
 					var totalBookings = cartItems.Sum(item => item.Quantity);
-					
 
-					// Updates total spendings and total bookings
-					var user = _context.Users.Find(Convert.ToInt32(id));
+                    foreach (var item in cartItems)
+                    {
+						var cartitemid = _context.CartItems.Find(Convert.ToInt32(item.Id));
+						if (cartitemid != null)
+						{
+                            _context.CartItems.Remove(cartitemid);
+                        }
+                        _context.SaveChanges();
+                    }
+
+                    // Updates total spendings and total bookings
+                    var user = _context.Users.Find(Convert.ToInt32(id));
 					if (user != null)
 					{
 						user.TotalSpent += totalSpendings;
@@ -210,6 +219,8 @@ namespace EDP_Project_Backend.Controllers
 							}
 						}
 					}
+
+
 
 
 					// Place any of your codes that need to interact with the db above the used voucher
