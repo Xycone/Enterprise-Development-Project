@@ -176,7 +176,18 @@ namespace EDP_Project_Backend.Controllers
 						var cartitemid = _context.CartItems.Find(Convert.ToInt32(item.Id));
 						if (cartitemid != null)
 						{
-                            _context.CartItems.Remove(cartitemid);
+                            var order = new Order
+                            {
+                                UserId = Convert.ToInt32(id),
+                                ActivityName = item.Name,
+                                Quantity = item.Quantity,
+                                TotalPrice = item.Quantity * item.Price,
+                                OrderDate = DateTime.Now
+                            };
+
+                            _context.Orders.Add(order);
+                
+                        _context.CartItems.Remove(cartitemid);
                         }
                         _context.SaveChanges();
                     }
