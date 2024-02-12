@@ -31,46 +31,10 @@ namespace EDP_Project_Backend.Controllers
             .Select(c => c.Value).SingleOrDefault());
         }
 
-        // Called after payment is successful
-        [HttpPut("update-bookings"), Authorize]
-        public IActionResult UpdateUserBookings(int totalItems)
-        {
-            int userId = GetUserId();
-            var user = _context.Users.Find(userId);
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
-
-            user.TotalBookings += totalItems;
-            _context.SaveChanges();
-
-            return Ok("Number of events booked is successfully added to the user account");
-        }
-
-        // Called after payment is successful
-        [HttpPut("update-spendings"), Authorize]
-        public IActionResult UpdateUserSpendings(int totalAmt)
-        {
-            int userId = GetUserId();
-            var user = _context.Users.Find(userId);
-            if (user == null)
-            {
-                return NotFound("User not found");
-            }
-
-            user.TotalSpent += totalAmt;
-            _context.SaveChanges();
-
-            return Ok("Amt that was just spent is successfully added to the user account");
-        }
-
         // Called after update-spendings and update-bookings is called to check if there shd be any upgrades in tier
         [HttpPut("update-tier"), Authorize]
-        public IActionResult UpdateUserTier()
+        public IActionResult UpdateUserTier(int userId)
         {
-            int userId = GetUserId();  // Assuming you have a method to get the user ID
-
             var user = _context.Users.Find(userId);
 
             if (user == null)
@@ -100,17 +64,17 @@ namespace EDP_Project_Backend.Controllers
                     user.TotalSpent -= userTier.TierSpendings;
 
                     _context.SaveChanges();
-                    return Ok("User tier upgraded successfully.");
+                    return Ok(true);
                 }
                 else
                 {
-                    return BadRequest("No higher tier available for upgrade.");
+                    return BadRequest(false);
                 }
 
             }
             else
             {
-                return BadRequest("User does not meet the criteria for tier upgrade");
+                return BadRequest(false);
             }
         }
     }

@@ -36,9 +36,7 @@ namespace EDP_Project_Backend.Controllers
 				// Log or handle the exception as needed
 				Console.WriteLine($"Error in GetUserId: {ex.Message}");
 			}
-
-			// Return a default value (e.g., 2) if the user ID is not available or not valid.
-			return 1;
+			return 0;
 		}
 		[HttpGet]
         public IActionResult GetAll()

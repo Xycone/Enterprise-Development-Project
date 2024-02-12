@@ -10,6 +10,7 @@ namespace EDP_Project_Backend.Models
 		public int Quantity { get; set; }
 		[Required, Range(0, float.MaxValue)]
 		public float Price { get; set; }
-
+		[Required]
+		public int ActivityId { get; set; }
 	}
 }

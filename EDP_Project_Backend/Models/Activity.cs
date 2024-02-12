@@ -17,7 +17,10 @@ namespace EDP_Project_Backend.Models
 
         // Navigation property to ActivityListing
         public ActivityListing ActivityListing { get; set; }
-        //[JsonIgnore]
-        //public List<CartItem>? CartItems { get; set; }
+        [JsonIgnore]
+        public List<CartItem>? CartItems { get; set; }
+        [JsonIgnore]
+        public List<Review>? Reviews { get; set; }
+
     }
 }

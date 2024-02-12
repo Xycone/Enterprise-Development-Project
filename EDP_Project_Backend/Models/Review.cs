@@ -5,7 +5,6 @@ namespace EDP_Project_Backend.Models
     public class Review
     {
         public int Id { get; set; }
-        public int activityId { get; set; } // temp until i get activity stuff
         public DateTime Date { get; set; }
         public int starRating { get; set; }
         public string Desc { get; set; }
@@ -14,8 +13,10 @@ namespace EDP_Project_Backend.Models
         // Foreign key
         // Review belongs to a user
 		public int UserId { get; set; }
-		// Navigation property to represent the one-to-many relationship
 		public User? User { get; set; }
-	}
+        //FK => Review belongs to a Activity
+        public Activity? Activity { get; set; }
+        public int ActivityId { get; set; }
+    }
 }
 

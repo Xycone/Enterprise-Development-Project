@@ -57,6 +57,15 @@ namespace EDP_Project_Backend.Controllers
             return Ok(orderDTO);
         }
 
+        [HttpGet("user/{userId}")]
+        [ProducesResponseType(typeof(IEnumerable<OrderDTO>), StatusCodes.Status200OK)]
+        public IActionResult GetOrdersByUserId(int userId)
+        {
+            var orders = _context.Orders.Where(o => o.UserId == userId).ToList();
+            var orderDTOs = orders.Select(order => _mapper.Map<OrderDTO>(order));
+            return Ok(orderDTOs);
+        }
+
         [HttpPost]
         [ProducesResponseType(typeof(OrderDTO), StatusCodes.Status200OK)]
         public IActionResult AddOrder([FromBody] AddOrderRequest orderRequest)
@@ -78,8 +87,10 @@ namespace EDP_Project_Backend.Controllers
             var newOrder = new Order
             {
                 UserId = userId,
-                OrderDate = orderRequest.OrderDate,
-                OrderTotal = orderRequest.OrderTotal
+                ActivityName = orderRequest.ActivityName,
+                Quantity = orderRequest.Quantity,
+                TotalPrice = orderRequest.TotalPrice,
+                OrderDate = orderRequest.OrderDate
             };
 
             // Save the new order to the database
@@ -90,30 +101,6 @@ namespace EDP_Project_Backend.Controllers
             var createdOrderDTO = _mapper.Map<OrderDTO>(newOrder);
 
             return Ok(createdOrderDTO);
-        }
-        [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult UpdateOrder(int id, [FromBody] UpdateOrderRequest updateOrderRequest)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var order = _context.Orders.FirstOrDefault(o => o.Id == id);
-
-            if (order == null)
-            {
-                return NotFound($"Order with ID {id} not found.");
-            }
-
-            order.OrderDate = updateOrderRequest.OrderDate;
-            order.OrderTotal = updateOrderRequest.OrderTotal;
-
-            _context.SaveChanges();
-
-            return NoContent();
         }
 
         [HttpDelete("{id}")]
