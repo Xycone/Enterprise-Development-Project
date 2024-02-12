@@ -21,6 +21,6 @@ namespace EDP_Project_Backend.Models
 
         public int Capacity { get; set; }
 
-        public List<Activity> Activities { get; set; }
+        public string? ImageFile { get; set; } = string.Empty;
     }
 }

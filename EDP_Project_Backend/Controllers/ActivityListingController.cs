@@ -36,6 +36,7 @@ namespace EDP_Project_Backend.Controllers
                     Description = createListing.Description,
                     Nprice = createListing.Nprice,
                     Capacity = createListing.Capacity,
+                    ImageFile = createListing.ImageFile
                 };
                 Console.WriteLine(activityListing);
                 _context.ActivityListings.Add(activityListing);
@@ -118,6 +119,7 @@ namespace EDP_Project_Backend.Controllers
                 listingToUpdate.Description = updatedListingRequest.Description;
                 listingToUpdate.Nprice = updatedListingRequest.Nprice;
                 listingToUpdate.Capacity = updatedListingRequest.Capacity;
+                listingToUpdate.ImageFile = updatedListingRequest.ImageFile;
 
                 _context.Entry(listingToUpdate).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
