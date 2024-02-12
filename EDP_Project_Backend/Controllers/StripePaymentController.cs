@@ -38,7 +38,7 @@ namespace EDP_Project_Backend.Controllers
         [Route("create-checkout-session")]
         public ActionResult CreateCheckoutSession([FromBody] CheckoutRequest request)
         {
-			List<StripeItems> cartItems = request.SelectedCartItems;
+			List<CartItem> cartItems = request.SelectedCartItems;
 			int? appliedVoucher = request.SelectedVoucherId;
 			var id = GetUserId();
 
@@ -167,10 +167,15 @@ namespace EDP_Project_Backend.Controllers
 					var appliedVoucher = metadata["appliedVoucher"] ?? null;
 					var cartItemsJson = metadata["cartItems"];
 					var id = metadata["userId"];
-					var cartItems = JsonConvert.DeserializeObject<List<StripeItems>>(cartItemsJson);
+					var cartItems = JsonConvert.DeserializeObject<List<CartItem>>(cartItemsJson);
 					var totalSpendings = cartItems.Sum(item => item.Price * item.Quantity);
 					var totalBookings = cartItems.Sum(item => item.Quantity);
 					
+					foreach (var item in cartItems)
+					{
+						var cartId = item.Id;
+					}
+
 
 					// Updates total spendings and total bookings
 					var user = _context.Users.Find(Convert.ToInt32(id));
