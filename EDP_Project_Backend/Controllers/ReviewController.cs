@@ -55,12 +55,11 @@ namespace EDP_Project_Backend.Controllers
 		[HttpPost]
         public IActionResult AddReview(Review review)
         {
-            var now = DateTime.Now;
             var thisReview = new Review
             {
-                Date = now,
+                Date = review.Date,
                 Id = review.Id,
-                activityId = review.activityId,
+                ActivityId = review.ActivityId,
                 starRating = review.starRating,
                 Desc = review.Desc,
                 UserName = review.UserName,
