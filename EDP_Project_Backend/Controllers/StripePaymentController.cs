@@ -164,7 +164,7 @@ namespace EDP_Project_Backend.Controllers
 				{
 					// Retrieve metadata from the Stripe event
 					var metadata = session.Metadata;
-					var appliedVoucher = metadata["appliedVoucher"];
+					var appliedVoucher = metadata["appliedVoucher"] ?? null;
 					var cartItemsJson = metadata["cartItems"];
 					var id = metadata["userId"];
 					var cartItems = JsonConvert.DeserializeObject<List<StripeItems>>(cartItemsJson);
@@ -181,6 +181,41 @@ namespace EDP_Project_Backend.Controllers
 					}
 					_context.SaveChanges();
 
+					// Retrieve the tier associated with the user
+					if (user != null)
+					{
+						var userTier = _context.Tiers.FirstOrDefault(t => t.Id == user.TierId);
+						while (userTier != null && user.TotalBookings >= userTier.TierBookings && user.TotalSpent >= userTier.TierSpendings)
+						{
+							// Performs tier upgrade operation
+							var nextTier = _context.Tiers.FirstOrDefault(t => t.TierPosition == userTier.TierPosition + 1);
+							if (nextTier != null)
+							{
+								// Increase the user tier by 1
+								// Subtract the overflow bookings by the amt used to upgrade the tier
+								// Subtract the overflow spendings by the amt used to upgrade the tier
+								user.TierId = nextTier.Id;
+								user.TotalBookings -= userTier.TierBookings;
+								user.TotalSpent -= userTier.TierSpendings;
+
+								// Retrieve the next tier associated with the user
+								userTier = _context.Tiers.FirstOrDefault(t => t.Id == nextTier.Id);
+
+								_context.SaveChanges();
+							}
+							else
+							{
+								// If there's no next tier available, break out of the loop
+								break;
+							}
+						}
+					}
+
+
+					// Place any of your codes that need to interact with the db above the used voucher
+					// For some reason placing it below makes it not work i have no idea why and i cant be bothered
+
+
 					// Removes used voucher from db
 					if (appliedVoucher != null)
 					{
@@ -191,8 +226,6 @@ namespace EDP_Project_Backend.Controllers
 						}
 						_context.SaveChanges();
 					}
-
-
 
 
 
