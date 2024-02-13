@@ -64,6 +64,7 @@ namespace EDP_Project_Backend.Controllers
             {
 				var voucher = _context.Vouchers.FirstOrDefault(v => v.UserId == id && v.Id == appliedVoucher);
 
+
 				// Checks if the voucher applied actually belongs to the user logged in
 				if (voucher == null)
                 {
@@ -74,6 +75,14 @@ namespace EDP_Project_Backend.Controllers
 
 				// Retrieve the voucher's associated perk
 				var voucherInfo = _context.Perks.FirstOrDefault(p => p.Id == voucher.PerkId);
+
+				Debug.WriteLine("Total Cart Value: " + totalCartValue);
+
+				Debug.WriteLine("Total Cart Value: " + voucherInfo.MinSpend);
+
+				Debug.WriteLine("Total Cart Qty: " + totalQuantityInCart);
+
+				Debug.WriteLine("Total Cart MinSpend: " + voucherInfo.MinGroupSize);
 
 				if (voucherInfo == null)
 				{
@@ -91,17 +100,21 @@ namespace EDP_Project_Backend.Controllers
                 }
 
 				// Voucher Discount logic
-
+				Debug.WriteLine("fixed discount: " + voucherInfo.FixedDiscount);
+				Debug.WriteLine("percentage discount: " + voucherInfo.FixedDiscount);
 				// Apply voucher discount based on the voucher type
 				if (voucherInfo.FixedDiscount == 0)
 				{
-					discountAmount -= totalCartValue * (voucherInfo.PercentageDiscount / 100);
+					var discount = totalCartValue * ((float)voucherInfo.PercentageDiscount / 100);
+					discountAmount -= discount;
 				}
 				else if (voucherInfo.PercentageDiscount == 0)
 				{
 					discountAmount -= voucherInfo.FixedDiscount;
 				}
 			}
+
+			Debug.WriteLine("Discounted Amount: " + discountAmount);
 
 			lineItems.Add(new SessionLineItemOptions
 			{
