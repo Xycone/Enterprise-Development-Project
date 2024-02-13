@@ -136,6 +136,25 @@ namespace EDP_Project_Backend.Migrations
                     b.ToTable("CartItems");
                 });
 
+            modelBuilder.Entity("EDP_Project_Backend.Models.Notice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notices");
+                });
+
             modelBuilder.Entity("EDP_Project_Backend.Models.Order", b =>
                 {
                     b.Property<int>("Id")

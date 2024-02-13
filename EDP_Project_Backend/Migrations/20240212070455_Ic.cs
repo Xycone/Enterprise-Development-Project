@@ -7,11 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace EDP_Project_Backend.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:EDP_Project_Backend/Migrations/20240213011541_InitialCreate.cs
-    public partial class InitialCreate : Migration
-========
-    public partial class a : Migration
->>>>>>>> 40a566063ce560d2271615b9e5fb5925f9e1ef76:EDP_Project_Backend/Migrations/20240212193016_a.cs
+    public partial class Ic : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,8 +26,7 @@ namespace EDP_Project_Backend.Migrations
                     Category = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     Description = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false),
                     Nprice = table.Column<int>(type: "int", nullable: false),
-                    Capacity = table.Column<int>(type: "int", nullable: false),
-                    ImageFile = table.Column<string>(type: "longtext", nullable: true)
+                    Capacity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,10 +55,8 @@ namespace EDP_Project_Backend.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    ActivityName = table.Column<string>(type: "longtext", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    TotalPrice = table.Column<float>(type: "float", nullable: false),
-                    OrderDate = table.Column<DateTime>(type: "datetime", nullable: false)
+                    OrderDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    OrderTotal = table.Column<float>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -11,13 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-<<<<<<<< HEAD:EDP_Project_Backend/Migrations/20240213011541_InitialCreate.Designer.cs
-    [Migration("20240213011541_InitialCreate")]
-    partial class InitialCreate
-========
-    [Migration("20240212193016_a")]
-    partial class a
->>>>>>>> 40a566063ce560d2271615b9e5fb5925f9e1ef76:EDP_Project_Backend/Migrations/20240212193016_a.Designer.cs
+    [Migration("20240212070455_Ic")]
+    partial class Ic
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,9 +82,6 @@ namespace EDP_Project_Backend.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");
 
-                    b.Property<string>("ImageFile")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -150,17 +142,10 @@ namespace EDP_Project_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("ActivityName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<float>("TotalPrice")
+                    b.Property<float>("OrderTotal")
                         .HasColumnType("float");
 
                     b.Property<int>("UserId")

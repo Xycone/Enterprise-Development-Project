@@ -11,13 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDP_Project_Backend.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-<<<<<<<< HEAD:EDP_Project_Backend/Migrations/20240213011541_InitialCreate.Designer.cs
-    [Migration("20240213011541_InitialCreate")]
-    partial class InitialCreate
-========
-    [Migration("20240212193016_a")]
-    partial class a
->>>>>>>> 40a566063ce560d2271615b9e5fb5925f9e1ef76:EDP_Project_Backend/Migrations/20240212193016_a.Designer.cs
+    [Migration("20240212204152_c")]
+    partial class c
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -142,6 +137,25 @@ namespace EDP_Project_Backend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("CartItems");
+                });
+
+            modelBuilder.Entity("EDP_Project_Backend.Models.Notice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notices");
                 });
 
             modelBuilder.Entity("EDP_Project_Backend.Models.Order", b =>
