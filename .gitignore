@@ -362,3 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /EDP_Project_Backend/wwwroot/uploads
+/EDP_Project_Backend/Migrations/MyDbContextModelSnapshot.cs
+/.gitignore
